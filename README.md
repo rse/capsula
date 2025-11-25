@@ -17,11 +17,23 @@ Abstract
 
 **Capsula** is a utility program for executing a *Linux* command in the
 current working directory from within an encapsulated environment
-based on a *Docker* container. The crux is that the **Capsula** container
+based on a [*Docker*](https://www.docker.com/) or [*Podman*](https://podman.io/) container.
+The crux is that the **Capsula** container
 environment provides a special filesystem layout to the command, which
 mimics the host filesystem paths as close as possible, but prevents
 access to non-relevant areas of the user's home directory and persists
 changes to the areas outside the user's home directory.
+
+Prerequisites
+-------------
+
+Ensure that in your shell path one of the commands `docker`(1),
+`podman`(1) or `nerdctl`(1) exists. For this, under Linux install either
+[*Docker*](https://www.docker.com/) or [*Podman*](https://podman.io/).
+Under macOS or Windows alternatively install either
+[*Docker Desktop*](https://www.docker.com/products/docker-desktop/),
+[*Podman Desktop*](https://podman-desktop.io/) or
+[*Rancher Desktop*](https://rancherdesktop.io/).
 
 Installation
 ------------

@@ -118,6 +118,9 @@ const spool = new Spool()
             throw new Error(`necessary tool "${tool}" not found`)
         })
     }
+    const existsTool = async (tool: string) => {
+        return which(tool).then(() => true).catch(() => false)
+    }
 
     /*  determine base directory  */
     let basedir = ""
@@ -156,8 +159,13 @@ const spool = new Spool()
     const ENV_VOLUME    = "capsula"
 
     /*  build development environment image  */
-    await ensureTool("docker")
-    const imageExists = await execa("docker", [ "images", "-q", ENV_IMAGE ], { stdio: "ignore" })
+    const haveDocker  = await existsTool("docker")
+    const havePodman  = await existsTool("podman")
+    const haveRancher = await existsTool("nerdctl")
+    const docker = (haveDocker ? "docker" : (havePodman ? "podman" : (haveRancher ? "nerdctl" : "")))
+    if (docker === "")
+        throw new Error("neither docker(1), podman(1) or nerctl(1) command found in shell path")
+    const imageExists = await execa(docker, [ "images", "-q", ENV_IMAGE ], { stdio: "ignore" })
         .then(() => true).catch(() => false)
     if (!imageExists) {
         console.log("capsula: INFO: building development environment container image")
@@ -174,7 +182,7 @@ const spool = new Spool()
             subSpool.roll(rcfile, (rcfile) => fs.promises.unlink(rcfile))
             await fs.promises.writeFile(rcfile, rawBash, { encoding: "utf8" })
 
-            await execa("docker", [
+            await execa(docker, [
                 "build",
                 "--progress", "plain",
                 "-t", ENV_IMAGE,
@@ -193,11 +201,11 @@ const spool = new Spool()
     }
 
     /*  create capsula volume  */
-    const volumeExists = await execa("docker", [ "volume", "inspect", ENV_VOLUME ], { stdio: "ignore" })
+    const volumeExists = await execa(docker, [ "volume", "inspect", ENV_VOLUME ], { stdio: "ignore" })
         .then(() => true).catch(() => false)
     if (!volumeExists) {
         console.log("capsula: INFO: creating persistent volume")
-        await execa("docker", [ "volume", "create", ENV_VOLUME ], { stdio: "ignore" })
+        await execa(docker, [ "volume", "create", ENV_VOLUME ], { stdio: "ignore" })
             .catch((err) => { throw new Error(`failed to create persistent volume: ${err.message ?? err}`) })
     }
 
@@ -258,7 +266,7 @@ const spool = new Spool()
         dotfiles,
         ...process.argv.slice(2)
     ]
-    const result = await execa("docker", opts, { stdio: "inherit" })
+    const result = await execa(docker, opts, { stdio: "inherit" })
 
     /*  cleanup resources  */
     await spool.unrollAll()

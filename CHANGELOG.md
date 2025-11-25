@@ -2,6 +2,11 @@
 ChangeLog
 =========
 
+0.9.4 (2025-11-25)
+------------------
+
+- IMPROVEMENT: blindly add support for Podman [Desktop] and Rancher Desktop
+
 0.9.3 (2025-11-25)
 ------------------
 
