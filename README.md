@@ -1,4 +1,6 @@
 
+<img src="https://raw.githubusercontent.com/rse/capsula/master/etc/capsula-logo.png" width="400" align="right" alt=""/>
+
 Capsula
 =======
 
