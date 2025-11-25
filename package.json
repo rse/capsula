@@ -65,6 +65,7 @@
         "node":                         ">=22.0.0"
     },
     "scripts": {
+        "prepublishOnly":               "npm start build",
         "start":                        "stx -v4 -c etc/stx.conf"
     }
 }
