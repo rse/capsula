@@ -17,7 +17,7 @@
 current working directory from within an encapsulated environment
 based on a *Docker* container. The crux is that the **Capsula** container
 environment provides a special filesystem layout to the command, which
-mimicks the host filesystem paths as close as possible, but prevents
+mimics the host filesystem paths as close as possible, but prevents
 access to non-relevant areas of the user's home directory and persists
 changes to the areas outside the user's home directory.
 
@@ -82,7 +82,7 @@ commands with the following distinct design:
 
 3. *Home Directory* (user read/write):
    The home directory is empty except for the explicitly
-   configured paths (usuall dotfiles) and the working
+   configured paths (usually dotfiles) and the working
    directory.
    *RATIONALE*: This allows one to run the command inside the container
    with the same configuration as it is available on the host.
