@@ -1,5 +1,4 @@
 {
-    "private":                          true,
     "name":                             "capsula",
     "description":                      "Working Directory Encapsulation",
     "keywords":                         [ "encapsulation", "container", "docker" ],
