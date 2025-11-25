@@ -12,6 +12,7 @@ import os          from "node:os"
 import process     from "node:process"
 
 /*  external dependencies  */
+import CLIio       from "cli-io"
 import yargs       from "yargs"
 import { hideBin } from "yargs/helpers"
 import { execa }   from "execa"
@@ -53,8 +54,13 @@ class Spool {
     }
 }
 
-/*  establish asynchronous environment  */
+/*  central CLI context  */
+let cli: CLIio | null = null
+
+/*  centeral resource spool  */
 const spool = new Spool()
+
+/*  establish asynchronous environment  */
 ;(async () => {
     /*  ensure proper cleanup  */
     tmp.setGracefulCleanup()
@@ -127,6 +133,14 @@ const spool = new Spool()
         process.exit(0)
     }
 
+    /*  establish CLI environment  */
+    cli = new CLIio({
+        encoding:  "utf8",
+        logLevel:  args.verbose ? "info" : "warning",
+        logTime:   false,
+        logPrefix: "capsula"
+    })
+
     /*  helper function for ensuring a tool is available  */
     const ensureTool = async (tool: string) => {
         await which(tool).catch(() => {
@@ -189,7 +203,7 @@ const spool = new Spool()
     const imageExists = await execa(docker, [ "images", "-q", ENV_IMAGE ], { stdio: "ignore" })
         .then(() => true).catch(() => false)
     if (!imageExists) {
-        console.log("capsula: INFO: building development environment container image")
+        cli.log("info", "building development environment container image")
         const subSpool = spool.sub()
         ;(async () => {
             const tmpdir = tmp.dirSync({ mode: 0o750, prefix: "capsula-" })
@@ -225,7 +239,7 @@ const spool = new Spool()
     const volumeExists = await execa(docker, [ "volume", "inspect", ENV_VOLUME ], { stdio: "ignore" })
         .then(() => true).catch(() => false)
     if (!volumeExists) {
-        console.log("capsula: INFO: creating persistent volume")
+        cli.log("info", "creating persistent volume")
         await execa(docker, [ "volume", "create", ENV_VOLUME ], { stdio: "ignore" })
             .catch((err) => { throw new Error(`failed to create persistent volume: ${err.message ?? err}`) })
     }
@@ -285,7 +299,7 @@ const spool = new Spool()
         home,
         workdir,
         dotfiles,
-        ...process.argv.slice(2)
+        ...args._.map((x) => String(x))
     ]
     const result = await execa(docker, opts, { stdio: "inherit" })
 
@@ -294,13 +308,16 @@ const spool = new Spool()
 
     /*  terminate gracefully  */
     if (result.exitCode !== 0) {
-        process.stderr.write(`capsula: WARNING: failed to execute: ${result.stderr}\n`)
+        cli.log("warning", `failed to execute: ${result.stderr}`)
         process.exit(result.exitCode)
     }
     process.exit(0)
 })().catch(async (err) => {
     /*  cleanup resources and terminate ungracefully  */
-    process.stderr.write(`capsula: ERROR: ${err.message ?? err}\n`)
+    if (cli !== null)
+        cli.log("error", err.message ?? err)
+    else
+        process.stderr.write(`rulebook: ERROR: ${err.message ?? err} ${err.stack}\n`)
     await spool.unrollAll()
     process.exit(1)
 })
