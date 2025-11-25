@@ -6,9 +6,9 @@
     "homepage":                         "http://github.com/rse/capsula",
     "repository":                       { "url": "git+https://github.com/rse/capsula.git", "type": "git" },
     "bugs":                             { "url": "http://github.com/rse/capsula/issues" },
-    "version":                          "0.0.0",
+    "version":                          "0.9.0",
     "license":                          "MIT",
-    "bin":                              { "capsula": "capsula-host.js" },
+    "bin":                              { "capsula": "dst-stage2/capsula.js" },
     "author": {
         "name":                         "Dr. Ralf S. Engelschall",
         "email":                        "rse@engelschall.com",
