@@ -2,6 +2,11 @@
 ChangeLog
 =========
 
+0.9.3 (2025-11-25)
+------------------
+
+- BUGFIX: fix packaging and publishing again
+
 0.9.2 (2025-11-25)
 ------------------
 
