@@ -62,7 +62,14 @@ const spool = new Spool()
     /*  parse command-line arguments  */
     const coerce = (arg: string) => Array.isArray(arg) ? arg[arg.length - 1] : arg
     const args = await yargs()
-        .usage("Usage: capsula [-v] [<command> ...]")
+        .usage("Usage: capsula " +
+            "[-V] " +
+            "[-v] " +
+            "[-p <platform>] " +
+            "[-d <docker>] " +
+            "[-c <context>] " +
+            "[<command> ...]"
+        )
         .version(false)
         .option("version", {
             alias:    "V",
