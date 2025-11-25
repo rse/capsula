@@ -225,7 +225,7 @@ const spool = new Spool()
     const uid = ui.uid.toString()
     const gid = ui.gid.toString()
     const usr = ui.username
-    ensureTool("id")
+    await ensureTool("id")
     const response = await execa("id", [ "-g", "-n" ], { stdio: [ "ignore", "pipe", "ignore" ] })
         .catch((err) => { throw new Error(`failed to determine group name: ${err.message ?? err}`) })
     const grp = response.stdout.trim()
@@ -257,7 +257,7 @@ const spool = new Spool()
     const result = await execa("docker", opts, { stdio: "inherit" })
 
     /*  cleanup resources  */
-    spool.unrollAll()
+    await spool.unrollAll()
 
     /*  terminate gracefully  */
     if (result.exitCode !== 0) {
@@ -265,10 +265,10 @@ const spool = new Spool()
         process.exit(result.exitCode)
     }
     process.exit(0)
-})().catch((err) => {
+})().catch(async (err) => {
     /*  cleanup resources and terminate ungracefully  */
     process.stderr.write(`capsula: ERROR: ${err.message ?? err}\n`)
-    spool.unrollAll()
+    await spool.unrollAll()
     process.exit(1)
 })
 
