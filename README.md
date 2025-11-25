@@ -1,0 +1,2 @@
+# capsula
+Encapsulated Command Execution
