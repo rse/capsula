@@ -48,7 +48,7 @@ $ npm install -g capsula
 
 Alternatively, if you don't have Node.js installed, fetch one of the
 [released standalone **Capsula** executables](https://github.com/rse/capsula/releases),
-which are pre-built fusion of the Node.js runtime and the Capsula code.
+which are a pre-built fusion of the Node.js runtime and the Capsula code.
 
 Usage
 -----
