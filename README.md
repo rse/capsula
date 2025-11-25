@@ -27,8 +27,8 @@ changes to the areas outside the user's home directory.
 Prerequisites
 -------------
 
-Ensure that in your shell path one of the commands `docker`(1),
-`podman`(1) or `nerdctl`(1) exists. For this, under Linux install either
+Ensure that in your shell path one of the commands `docker`,
+`podman` or `nerdctl` exists. For this, under Linux install either
 [*Docker*](https://www.docker.com/) or [*Podman*](https://podman.io/).
 Under macOS or Windows alternatively install either
 [*Docker Desktop*](https://www.docker.com/products/docker-desktop/),
