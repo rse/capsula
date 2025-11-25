@@ -34,13 +34,21 @@ Under macOS or Windows alternatively install either
 [*Docker Desktop*](https://www.docker.com/products/docker-desktop/),
 [*Podman Desktop*](https://podman-desktop.io/) or
 [*Rancher Desktop*](https://rancherdesktop.io/).
+Additionally, install the runtime [Node.js](https://nodejs.org)
+when you are planning to install **Capsula** with NPM (see below).
 
 Installation
 ------------
 
+Use the Node Package Manager (NPM) to install **Capsula**:
+
 ```
 $ npm install -g capsula
 ```
+
+Alternatively, if you don't have Node.js installed, fetch one of the
+[released **Capsula** binaries](https://github.com/rse/capsula/releases)
+(they are a pre-built fusion of the Node.js runtime and the Capsula code).
 
 Usage
 -----
