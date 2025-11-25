@@ -8,7 +8,6 @@ import * as Vite          from "vite"
 import { tscPlugin }      from "@wroud/vite-plugin-tsc"
 import nodeExternals      from "rollup-plugin-node-externals"
 import { viteStaticCopy } from "vite-plugin-static-copy"
-import arraybuffer        from "vite-plugin-arraybuffer"
 
 export default Vite.defineConfig(({ command, mode }) => ({
     logLevel: "info",
@@ -16,7 +15,6 @@ export default Vite.defineConfig(({ command, mode }) => ({
     base: "",
     root: "",
     plugins: [
-        arraybuffer(),
         tscPlugin({
             tscArgs: [ "--project", "etc/tsc.json" ],
             prebuild: true
