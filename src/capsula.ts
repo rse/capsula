@@ -237,7 +237,11 @@ const spool = new Spool()
     subSpool.roll(rcfile, (rcfile) => fs.promises.unlink(rcfile))
     await fs.promises.writeFile(rcfile, rawBash, { mode: 0o750, encoding: "utf8" })
     opts = [
-        "run", "--rm", "-i", "-t", "--privileged",
+        "run",
+        "--rm",
+        "-i",
+        ...((process.stdin.isTTY ?? false) ? [ "-t" ] : []),
+        "--privileged",
         "-e", "TERM", "-e", "HOME",
         "-v", `${rcfile}:/etc/capsula-container:ro`,
         ...opts,

@@ -5,6 +5,7 @@ ChangeLog
 0.9.3 (2025-11-25)
 ------------------
 
+- IMPROVEMENT: pass option "-t" only to "docker run" when stdin is a TTY
 - BUGFIX: fix packaging and publishing again
 
 0.9.2 (2025-11-25)
