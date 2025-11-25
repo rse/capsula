@@ -54,7 +54,7 @@ environment:
 ```sh
 $ capsula apt update
 $ capsula apt install -y nodejs
-$ capsula npm install -g @anthropic/claude-code
+$ capsula npm install -g @anthropic-ai/claude-code
 $ capsula claude
 ```
 
