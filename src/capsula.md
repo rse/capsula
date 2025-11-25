@@ -8,6 +8,7 @@
 \[`-V`|`--version`\]
 \[`-v`|`--verbose`\]
 \[`-p`|`--platform` *platform*\]
+\[`-d`|`--docker` *docker*\]
 \[`-c`|`--context` *context*\]
 \[*command* ...\]
 
@@ -37,6 +38,10 @@ The following command-line options and arguments exist to the `capsula(1)` comma
 - \[`-p`|`--platform` *platform*\]:
   Use a certain Linux platform for the Docker container.
   Currently `debian` and `alpine` are supported.
+
+- \[`-d`|`--docker` *docker*\]:
+  Use a certain `docker`(1) compatible command for access
+  to the container runtime.
 
 - \[`-c`|`--context` *context*\]:
   Use a certain context for naming the Docker container and volume.

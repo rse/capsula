@@ -89,6 +89,14 @@ const spool = new Spool()
             choices:  [ "debian", "alpine" ] as const,
             describe: "set Linux platform (\"debian\" or \"alpine\")"
         })
+        .option("docker", {
+            alias:    "d",
+            type:     "string",
+            array:    false,
+            coerce,
+            default:  "",
+            describe: "set docker(1) compatible tool"
+        })
         .option("context", {
             alias:    "c",
             type:     "string",
@@ -158,13 +166,19 @@ const spool = new Spool()
     const ENV_CONTAINER = "capsula"
     const ENV_VOLUME    = "capsula"
 
-    /*  build development environment image  */
+    /*  determine docker(1) compatible tool  */
     const haveDocker  = await existsTool("docker")
     const havePodman  = await existsTool("podman")
     const haveRancher = await existsTool("nerdctl")
-    const docker = (haveDocker ? "docker" : (havePodman ? "podman" : (haveRancher ? "nerdctl" : "")))
+    const docker = (
+        args.docker !== "" ? args.docker : (
+            haveDocker ? "docker" : (
+                havePodman ? "podman" : (
+                    haveRancher ? "nerdctl" : ""))))
     if (docker === "")
         throw new Error("neither docker(1), podman(1) or nerctl(1) command found in shell path")
+
+    /*  build development environment image  */
     const imageExists = await execa(docker, [ "images", "-q", ENV_IMAGE ], { stdio: "ignore" })
         .then(() => true).catch(() => false)
     if (!imageExists) {
