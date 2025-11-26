@@ -2,6 +2,13 @@
 ChangeLog
 =========
 
+0.9.7 (2025-11-27)
+------------------
+
+- IMPROVEMENT: add platform to names
+- IMPROVEMENT: switch to info level by default
+- IMPROVEMENT: switch to plain non-node container images by default
+
 0.9.6 (2025-11-27)
 ------------------
 
