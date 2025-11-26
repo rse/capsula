@@ -179,32 +179,6 @@ const spool = new Spool()
         return which(tool).then(() => true).catch(() => false)
     }
 
-    /*  determine base directory  */
-    let basedir = ""
-    const scriptPath = process.argv[1]
-    if (path.isAbsolute(scriptPath))
-        /*  absolute path  */
-        basedir = path.dirname(scriptPath)
-    else if (scriptPath.includes(path.sep))
-        /*  relative path  */
-        basedir = path.resolve(path.dirname(scriptPath))
-    else if (fs.existsSync(path.join(process.cwd(), scriptPath)))
-        /*  local usage  */
-        basedir = process.cwd()
-    else {
-        /*  search in PATH  */
-        const pathDirs = (process?.env?.PATH ?? "").split(path.delimiter)
-        for (const dir of pathDirs) {
-            if (fs.existsSync(path.join(dir, scriptPath))) {
-                basedir = dir
-                break
-            }
-        }
-        if (!basedir)
-            throw new Error("capsula: ERROR: cannot determine base directory")
-    }
-    cli.log("debug", `base directory: ${chalk.blue(basedir)}`)
-
     /*  detect current working directory  */
     const workdir = process.cwd()
     const home    = os.homedir()

@@ -8,6 +8,7 @@ ChangeLog
 - IMPROVEMENT: allows dotfiles and environment to be configured
 - BUGFIX: fix building of container image
 - CLEANUP: cleanup usage documentation
+- CLEANUP: remove no longer needed base directory calculation
 
 0.9.5 (2025-11-26)
 ------------------
