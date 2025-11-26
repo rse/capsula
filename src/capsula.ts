@@ -272,6 +272,10 @@ const spool = new Spool()
         ".tmux.conf .claude! .claude.json! .gitconfig .npmrc .vimrc .vim " +
         ".cache!"
 
+    /*  list of environment variables to expose  */
+    //  FIXME
+    const envvars = [ "TERM", "HOME" ]
+
     /*  determine "docker run" options for dotfiles  */
     let opts = []
     for (let dotfile of dotfiles.split(" ")) {
@@ -284,6 +288,8 @@ const spool = new Spool()
         const mountOption = ro ? ":ro" : ""
         opts.push("-v", `${dotfilePath}:/mnt/fs-home${dotfilePath}${mountOption}`)
     }
+    for (const envvar of envvars)
+        opts.push("-e", envvar)
 
     /*  execute development environment image  */
     const ui = os.userInfo()
@@ -304,12 +310,11 @@ const spool = new Spool()
     opts = [
         "run",
         "--rm",
+        "--privileged",
         "-i",
         ...((process.stdin.isTTY ?? false) ? [ "-t" ] : []),
-        "--privileged",
-        "-e", "TERM", "-e", "HOME",
-        "-v", `${rcfile}:/etc/capsula-container:ro`,
         ...opts,
+        "-v", `${rcfile}:/etc/capsula-container:ro`,
         "-v", `${workdir}:/mnt/fs-work${workdir}`,
         "-v", `${ENV_VOLUME}:/mnt/fs-volume`,
         "--name", ENV_CONTAINER,
