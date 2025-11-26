@@ -78,9 +78,19 @@ cd /mnt/fs-root
 pivot_root . fs-root-old
 umount -l /fs-root-old
 
+#   provide hint about platform
+if [[ -f /etc/alpine-release ]]; then
+    PLATFORM="alpine"
+elif [[ -f /etc/debian_version ]]; then
+    PLATFORM="debian"
+fi
+export PLATFORM
+
 #   provide hint about environment
-ENVIRONMENT="capsula/$(uname -s)"
+ENVIRONMENT="capsula"
 export ENVIRONMENT
+
+#   enforce shell
 SHELL=/bin/bash
 export SHELL
 
@@ -90,7 +100,7 @@ if ! getent group $grp >/dev/null 2>&1; then
 fi
 if ! getent passwd $usr >/dev/null 2>&1; then
     if [[ -f /etc/alpine-release ]]; then
-        useradd -M -d $homedir -s $SHELL -u $uid -g $grp -G wheel $usr >/dev/null 2>&
+        useradd -M -d $homedir -s $SHELL -u $uid -g $grp -G wheel $usr >/dev/null 2>&1
     elif [[ -f /etc/debian_version ]]; then
         useradd -M -d $homedir -s $SHELL -u $uid -g $grp -G sudo $usr
     fi
@@ -115,9 +125,9 @@ cd "$workdir"
 if [[ $# -eq 0 ]]; then
     #   enter an interactive shell
     #   FIXME: env vars?
-    exec sudo -n "--preserve-env=ENVIRONMENT,SHELL" -g "$grp" -u "$usr" $SHELL -i
+    exec sudo -n "--preserve-env=ENVIRONMENT,PLATFORM,SHELL" -g "$grp" -u "$usr" $SHELL -i
 else
     #   execute batch command
-    exec sudo -n "--preserve-env=ENVIRONMENT,SHELL" -g "$grp" -u "$usr" "$@"
+    exec sudo -n "--preserve-env=ENVIRONMENT,PLATFORM,SHELL" -g "$grp" -u "$usr" "$@"
 fi
 
