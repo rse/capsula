@@ -204,9 +204,10 @@ const spool = new Spool()
 
     /*  define the container volume, container image and container names  */
     const username      = os.userInfo().username
-    const nameVolume    = `capsula-${username}-${args.context}`
-    const nameImage     = `capsula-${username}-${args.context}:${pkg.version}`
-    const nameContainer = `capsula-${username}-${args.context}-${DateTime.now().toFormat("yyyy-MM-dd-HH-mm-ss-SSS")}`
+    const timestamp     = DateTime.now().toFormat("yyyy-MM-dd-HH-mm-ss-SSS")
+    const nameVolume    = `capsula-${username}-${args.platform}-${args.context}`
+    const nameImage     = `capsula-${username}-${args.platform}-${args.context}:${pkg.version}`
+    const nameContainer = `capsula-${username}-${args.platform}-${args.context}-${timestamp}`
 
     /*  determine docker(1) compatible tool  */
     const haveDocker  = await existsTool("docker")
