@@ -5,8 +5,8 @@
 
 `capsula`
 \[`-h`|`--help`\]
-\[`-V`|`--version`\]
-\[`-v`|`--verbose`\]
+\[`-v`|`--version`\]
+\[`-l`|`--log-level` *level*\]
 \[`-p`|`--platform` *platform*\]
 \[`-d`|`--docker` *docker*\]
 \[`-c`|`--context` *context*\]
@@ -29,11 +29,11 @@ The following command-line options and arguments exist to the `capsula(1)` comma
 - \[`-h`|`--help`\]:
   Show program usage information only.
 
-- \[`-V`|`--version`\]:
+- \[`-v`|`--version`\]:
   Show program version information only.
 
-- \[`-v`|`--verbose`\]:
-  Enable verbose messages.
+- \[`-l`|`--log-level` *level*\]:
+  Set the logging level: `error`, `warning`, `info` or `debug`.
 
 - \[`-p`|`--platform` *platform*\]:
   Use a certain Linux platform for the Docker container.
