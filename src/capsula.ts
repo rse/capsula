@@ -306,7 +306,7 @@ const spool = new Spool()
     const envvars = config[args.context]?.environment ?? config.default?.environment ?? []
 
     /*  determine "docker run" options for dotfiles  */
-    let opts = []
+    const opts = []
     for (let dotfile of dotfiles) {
         let ro = true
         if (dotfile.endsWith("!")) {
@@ -346,6 +346,7 @@ const spool = new Spool()
 
     /*  execute command inside encapsulating container  */
     const result = await exec(docker, [
+        /*  standard arguments  */
         "run",
         "--rm",
         "--privileged",
@@ -357,6 +358,8 @@ const spool = new Spool()
         "-v", `${nameVolume}:/mnt/fs-volume`,
         "--name", nameContainer,
         "--entrypoint", "/etc/capsula-container",
+
+        /*  entrypoint arguments  */
         nameImage,
         hostname,
         usr, uid,
@@ -364,6 +367,8 @@ const spool = new Spool()
         home,
         workdir,
         dotfileInfo,
+
+        /*  command to execute  */
         ...args._.map((x) => String(x))
     ], { stdio: "inherit" })
 
