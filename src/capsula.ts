@@ -224,7 +224,7 @@ const spool = new Spool()
     /*  build development environment image  */
     const imageId = await exec(docker, [ "images", "-q", nameImage ], { stdio: [ "ignore", "pipe", "ignore" ] })
     if ((imageId.stdout ?? "") === "") {
-        cli.log("info", `building container image ${chalk.blue(nameImage)}`)
+        cli.log("info", `creating container image ${chalk.blue(nameImage)}`)
         const subSpool = spool.sub()
         await (async () => {
             const tmpdir = tmp.dirSync({ mode: 0o750, prefix: "capsula-" })
@@ -241,7 +241,7 @@ const spool = new Spool()
             await new Promise<void>((resolve, reject) => {
                 let spinner: ReturnType<typeof Ora> | null = null
                 let spinnerStarted = false
-                if (args.logLevel !== "debug") {
+                if (args.logLevel === "info") {
                     spinner = Ora()
                     spinner.color = "red"
                     spinner.prefixText = `capsule: ${chalk.blue("INFO")}:`
@@ -323,7 +323,7 @@ const spool = new Spool()
     for (const envvar of envvars)
         opts.push("-e", envvar)
 
-    /*  execute development environment image  */
+    /*  determine user/group information  */
     const ui = os.userInfo()
     const uid = ui.uid.toString()
     const gid = ui.gid.toString()
@@ -332,14 +332,20 @@ const spool = new Spool()
     const response = await exec("id", [ "-g", "-n" ], { stdio: [ "ignore", "pipe", "ignore" ] })
         .catch((err: any) => { throw new Error(`failed to determine group name: ${err.message ?? err}`) })
     const grp = response.stdout.trim()
+
+    /*  determine host information  */
     const hostname = os.hostname()
+
+    /*  create local copies of entrypoint script  */
     const subSpool = spool.sub()
     const tmpdir = tmp.dirSync({ mode: 0o750, prefix: "capsula-" })
     subSpool.roll(tmpdir, (tmpdir) => { tmpdir.removeCallback() })
     const rcfile = path.join(tmpdir.name, "capsula-container.bash")
     subSpool.roll(rcfile, (rcfile) => fs.promises.unlink(rcfile))
     await fs.promises.writeFile(rcfile, rawBash, { mode: 0o750, encoding: "utf8" })
-    opts = [
+
+    /*  execute command inside encapsulating container  */
+    const result = await exec(docker, [
         "run",
         "--rm",
         "--privileged",
@@ -359,8 +365,7 @@ const spool = new Spool()
         workdir,
         dotfileInfo,
         ...args._.map((x) => String(x))
-    ]
-    const result = await exec(docker, opts, { stdio: "inherit" })
+    ], { stdio: "inherit" })
 
     /*  cleanup resources  */
     await spool.unrollAll()
