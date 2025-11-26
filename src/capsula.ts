@@ -245,7 +245,7 @@ const spool = new Spool()
                 if (args.logLevel === "info") {
                     spinner = Ora()
                     spinner.color = "red"
-                    spinner.prefixText = `capsule: ${chalk.blue("INFO")}:`
+                    spinner.prefixText = "capsule: INFO:"
                     spinner.spinner = "dots"
                     subSpool.roll(spinner, (spinner) => { spinner.stop() })
                 }
