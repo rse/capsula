@@ -6,6 +6,7 @@ ChangeLog
 ------------------
 
 - IMPROVEMENT: allows dotfiles and environment to be configured
+- IMPROVEMENT: add spinner to track "docker build" output
 - BUGFIX: fix building of container image
 - BUGFIX: stop parsing command-line options on first non-option
 - CLEANUP: cleanup usage documentation

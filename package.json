@@ -51,7 +51,8 @@
         "execa":                        "9.6.0",
         "which":                        "6.0.0",
         "tmp":                          "0.2.5",
-        "yaml":                         "2.8.1"
+        "yaml":                         "2.8.1",
+        "ora":                          "9.0.0"
     },
     "overrides" : {
         "@liuli-util/vite-plugin-node": { "vite": ">=6.0.0" }

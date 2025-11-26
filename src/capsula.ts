@@ -20,6 +20,7 @@ import chalk                   from "chalk"
 import which                   from "which"
 import tmp                     from "tmp"
 import jsYAML                  from "yaml"
+import Ora                     from "ora"
 
 /*  internal dependencies  */
 import pkg                     from "../package.json"                           with { type: "json"   }
@@ -178,6 +179,8 @@ const spool = new Spool()
             throw new Error(`necessary tool "${tool}" not found`)
         })
     }
+
+    /*  helper function for checking whether a tool is available  */
     const existsTool = async (tool: string) => {
         return which(tool).then(() => true).catch(() => false)
     }
@@ -198,10 +201,10 @@ const spool = new Spool()
         Object.assign(config, obj)
     }
 
-    /*  the temporary development environment image and container name  */
-    const ENV_IMAGE     = `capsula-${args.context}:latest`
-    const ENV_CONTAINER = `capsula-${args.context}`
-    const ENV_VOLUME    = `capsula-${args.context}`
+    /*  the container image, container and volume  */
+    const nameImage     = `capsula-${args.context}:latest`
+    const nameContainer = `capsula-${args.context}`
+    const nameVolume    = `capsula-${args.context}`
 
     /*  determine docker(1) compatible tool  */
     const haveDocker  = await existsTool("docker")
@@ -217,11 +220,11 @@ const spool = new Spool()
     cli.log("debug", `docker command: ${chalk.blue(docker)}`)
 
     /*  build development environment image  */
-    const imageId = await exec(docker, [ "images", "-q", ENV_IMAGE ], { stdio: [ "ignore", "pipe", "ignore" ] })
+    const imageId = await exec(docker, [ "images", "-q", nameImage ], { stdio: [ "ignore", "pipe", "ignore" ] })
     if ((imageId.stdout ?? "") === "") {
-        cli.log("info", `building development environment container image ${chalk.blue(ENV_IMAGE)}`)
+        cli.log("info", `building container image ${chalk.blue(nameImage)}`)
         const subSpool = spool.sub()
-        ;(async () => {
+        await (async () => {
             const tmpdir = tmp.dirSync({ mode: 0o750, prefix: "capsula-" })
             subSpool.roll(tmpdir, (tmpdir) => { tmpdir.removeCallback() })
 
@@ -233,16 +236,50 @@ const spool = new Spool()
             subSpool.roll(rcfile, (rcfile) => fs.promises.unlink(rcfile))
             await fs.promises.writeFile(rcfile, rawBash, { encoding: "utf8" })
 
-            await exec(docker, [
-                "build",
-                "--progress", "plain",
-                "-t", ENV_IMAGE,
-                "-f", "Dockerfile",
-                "."
-            ], {
-                cwd:   tmpdir.name,
-                stdio: "inherit",
-                all:   true
+            await new Promise<void>((resolve, reject) => {
+                let spinner: ReturnType<typeof Ora> | null = null
+                let spinnerStarted = false
+                if (args.logLevel !== "debug") {
+                    spinner = Ora()
+                    spinner.color = "red"
+                    spinner.prefixText = `capsule: ${chalk.blue("INFO")}:`
+                    spinner.spinner = "dots"
+                    subSpool.roll(spinner, (spinner) => { spinner.stop() })
+                }
+                const response = exec(docker, [
+                    "build",
+                    "--progress", "plain",
+                    "-t", nameImage,
+                    "-f", "Dockerfile",
+                    "."
+                ], {
+                    cwd:   tmpdir.name,
+                    all:   true
+                })
+                response.all.on("data", (chunk: any) => {
+                    const lines = chunk.toString().split(/\r?\n/)
+                    if (spinner !== null) {
+                        spinner.text = `${docker}: | ${lines[0]}`
+                        if (!spinnerStarted) {
+                            spinner.start()
+                            spinnerStarted = true
+                        }
+                    }
+                    else
+                        for (const line of lines)
+                            if (line !== "")
+                                cli!.log("debug", `${docker}: | ${line}`)
+                })
+                response.all.on("error", (err) => {
+                    if (spinner !== null)
+                        spinner.fail(`${docker}: FAILED: ${err}`)
+                    reject(err)
+                })
+                response.all.on("end", () => {
+                    if (spinner !== null)
+                        spinner.succeed(`${docker}: SUCCEEDED`)
+                    resolve()
+                })
             })
         })().catch(async (err: any) => {
             throw new Error(`failed to build container: ${err?.message ?? err}`)
@@ -252,11 +289,11 @@ const spool = new Spool()
     }
 
     /*  create capsula volume  */
-    const volumeExists = await exec(docker, [ "volume", "inspect", ENV_VOLUME ], { stdio: "ignore" })
+    const volumeExists = await exec(docker, [ "volume", "inspect", nameVolume ], { stdio: "ignore" })
         .then(() => true).catch(() => false)
     if (!volumeExists) {
-        cli.log("info", `creating persistent volume ${chalk.blue(ENV_VOLUME)}`)
-        await exec(docker, [ "volume", "create", ENV_VOLUME ], { stdio: "ignore" })
+        cli.log("info", `creating persistent volume ${chalk.blue(nameVolume)}`)
+        await exec(docker, [ "volume", "create", nameVolume ], { stdio: "ignore" })
             .catch((err: any) => { throw new Error(`failed to create persistent volume: ${err.message ?? err}`) })
     }
 
@@ -309,10 +346,10 @@ const spool = new Spool()
         ...opts,
         "-v", `${rcfile}:/etc/capsula-container:ro`,
         "-v", `${workdir}:/mnt/fs-work${workdir}`,
-        "-v", `${ENV_VOLUME}:/mnt/fs-volume`,
-        "--name", ENV_CONTAINER,
+        "-v", `${nameVolume}:/mnt/fs-volume`,
+        "--name", nameContainer,
         "--entrypoint", "/etc/capsula-container",
-        ENV_IMAGE,
+        nameImage,
         hostname,
         usr, uid,
         grp, gid,
