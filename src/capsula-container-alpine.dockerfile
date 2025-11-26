@@ -24,10 +24,11 @@ RUN         apk add \
 
 #   install additional tools
 RUN         apk add \
-                shadow coreutils \
+                shadow coreutils ncurses \
                 sudo bash less tmux vim \
                 procps net-tools htop lsof strace \
                 mandoc man-pages man-pages-posix
+RUN         ln -sf /usr/bin/vim /usr/bin/vi
 
 #   reconfigure Alpine for EN/DE and ISO-Latin1/UTF8
 RUN         apk add musl-locales musl-locales-lang && \

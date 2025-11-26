@@ -85,15 +85,15 @@ SHELL=/bin/bash
 export SHELL
 
 #   provide same user/group as on host
-#if ! grep -q "^$grp:" /etc/group >/dev/null 2>&1; then
 if ! getent group $grp >/dev/null 2>&1; then
     groupadd -f -g $gid $grp
-    #groupadd -o -f -g $gid $grp
 fi
-#if ! grep -q "^$usr:" /etc/passwd >/dev/null 2>&1; then
 if ! getent passwd $usr >/dev/null 2>&1; then
-    useradd -M -d $homedir -s $SHELL -u $uid -g $grp -G sudo $usr
-    #useradd -M -d $homedir -s $SHELL -u $uid -g $grp -G wheel $usr
+    if [[ -f /etc/alpine-release ]]; then
+        useradd -M -d $homedir -s $SHELL -u $uid -g $grp -G wheel $usr >/dev/null 2>&
+    elif [[ -f /etc/debian_version ]]; then
+        useradd -M -d $homedir -s $SHELL -u $uid -g $grp -G sudo $usr
+    fi
 fi
 
 #   allows user to switch to superuser
@@ -105,8 +105,8 @@ fi
 #   grant access to home directory
 chown $usr:$grp "$homedir"
 
-#npm config set prefix /volume/npm
-#npm config set cache /volume/npm/.cache
+#   FIXME: npm config set prefix /volume/npm
+#   FIXME: npm config set cache /volume/npm/.cache
 
 #   implicitly change current working directory
 cd "$workdir"
@@ -114,6 +114,7 @@ cd "$workdir"
 #   pass-through execution
 if [[ $# -eq 0 ]]; then
     #   enter an interactive shell
+    #   FIXME: env vars?
     exec sudo -n "--preserve-env=ENVIRONMENT,SHELL" -g "$grp" -u "$usr" $SHELL -i
 else
     #   execute batch command
