@@ -7,6 +7,7 @@ ChangeLog
 
 - BUGFIX: fix argument passing to "docker run"
 - IMPROVEMENT: use CLIio for logging and connect option "-v"
+- CLEANUP: cleanup logging outputs
 
 0.9.4 (2025-11-25)
 ------------------

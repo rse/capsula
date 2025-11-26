@@ -6,24 +6,25 @@
 */
 
 /*  builtin dependencies  */
-import fs          from "node:fs"
-import path        from "node:path"
-import os          from "node:os"
-import process     from "node:process"
+import fs                      from "node:fs"
+import path                    from "node:path"
+import os                      from "node:os"
+import process                 from "node:process"
 
 /*  external dependencies  */
-import CLIio       from "cli-io"
-import yargs       from "yargs"
-import { hideBin } from "yargs/helpers"
-import { execa }   from "execa"
-import which       from "which"
-import tmp         from "tmp"
+import CLIio                   from "cli-io"
+import yargs                   from "yargs"
+import { hideBin }             from "yargs/helpers"
+import { execa, type Options } from "execa"
+import chalk                   from "chalk"
+import which                   from "which"
+import tmp                     from "tmp"
 
 /*  internal dependencies  */
-import pkg         from "../package.json"                           with { type: "json"   }
-import rawDocker1  from "./capsula-container-debian.dockerfile?raw" with { type: "string" }
-import rawDocker2  from "./capsula-container-alpine.dockerfile?raw" with { type: "string" }
-import rawBash     from "./capsula-container.bash?raw"              with { type: "string" }
+import pkg                     from "../package.json"                           with { type: "json"   }
+import rawDocker1              from "./capsula-container-debian.dockerfile?raw" with { type: "string" }
+import rawDocker2              from "./capsula-container-alpine.dockerfile?raw" with { type: "string" }
+import rawBash                 from "./capsula-container.bash?raw"              with { type: "string" }
 
 /*  helper class for resource spooling  */
 interface SpoolResource {
@@ -69,29 +70,32 @@ const spool = new Spool()
     const coerce = (arg: string) => Array.isArray(arg) ? arg[arg.length - 1] : arg
     const args = await yargs()
         .usage("Usage: capsula " +
-            "[-V] " +
-            "[-v] " +
-            "[-p <platform>] " +
-            "[-d <docker>] " +
-            "[-c <context>] " +
+            "[-h|--help] " +
+            "[-v|--version] " +
+            "[-l|--log-level <level>] " +
+            "[-p|--platform <platform>] " +
+            "[-d|--docker <docker>] " +
+            "[-c|--context <context>] " +
             "[<command> ...]"
         )
         .version(false)
         .option("version", {
-            alias:    "V",
+            alias:    "v",
             type:     "boolean",
             array:    false,
             coerce,
             default:  false,
             describe: "show program version"
         })
-        .option("verbose", {
-            alias:    "v",
-            type:     "boolean",
+        .option("log-level", {
+            alias:    "l",
+            type:     "string",
+            nargs:    1,
             array:    false,
             coerce,
-            default:  false,
-            describe: "enable verbose logging"
+            default:  "warning",
+            choices:  [ "error", "warning", "info", "debug" ] as const,
+            describe: "set logging level"
         })
         .option("platform", {
             alias:    "p",
@@ -136,10 +140,23 @@ const spool = new Spool()
     /*  establish CLI environment  */
     cli = new CLIio({
         encoding:  "utf8",
-        logLevel:  args.verbose ? "info" : "warning",
+        logLevel:  args.logLevel,
         logTime:   false,
         logPrefix: "capsula"
     })
+
+    /*  helper function wrapping execa()  */
+    const exec = <T extends Options>(cmd: string, args: string[], opts: T) => {
+        const str = [ cmd, ...args ].map((x) => x.match(/\s/) ? `'${x.replace(/'/g, "\\'")}'` : x).join(" ")
+        const options = []
+        if (opts.cwd)
+            options.push(`cwd: ${chalk.blue(opts.cwd)}`)
+        if (opts.stdio)
+            options.push(`stdio: ${chalk.blue(JSON.stringify(opts.stdio))}`)
+        cli!.log("debug", `executing command: $ ${chalk.bold(str)}` +
+            `${options.length > 0 ? ` (${options.join(", ")})` : ""}`)
+        return execa(cmd, args, opts)
+    }
 
     /*  helper function for ensuring a tool is available  */
     const ensureTool = async (tool: string) => {
@@ -175,12 +192,15 @@ const spool = new Spool()
         if (!basedir)
             throw new Error("capsula: ERROR: cannot determine base directory")
     }
+    cli.log("debug", `base directory: ${chalk.blue(basedir)}`)
 
     /*  detect current working directory  */
     const workdir = process.cwd()
     const home    = os.homedir()
+    cli!.log("debug", `home directory: ${chalk.blue(home)}`)
+    cli!.log("debug", `working directory: ${chalk.blue(workdir)}`)
     if (!workdir.startsWith(`${home}${path.sep}`))
-        throw new Error(`current working directory "${workdir}" not below home directory "${home}"`)
+        throw new Error(`working directory ${chalk.blue(workdir)} not below home directory ${chalk.blue(home)}`)
 
     /*  the temporary development environment image and container name  */
     const ENV_IMAGE     = "capsula"
@@ -198,12 +218,13 @@ const spool = new Spool()
                     haveRancher ? "nerdctl" : ""))))
     if (docker === "")
         throw new Error("neither docker(1), podman(1) or nerctl(1) command found in shell path")
+    cli.log("debug", `docker command: ${chalk.blue(docker)}`)
 
     /*  build development environment image  */
-    const imageExists = await execa(docker, [ "images", "-q", ENV_IMAGE ], { stdio: "ignore" })
+    const imageExists = await exec(docker, [ "images", "-q", ENV_IMAGE ], { stdio: "ignore" })
         .then(() => true).catch(() => false)
     if (!imageExists) {
-        cli.log("info", "building development environment container image")
+        cli.log("info", `building development environment container image ${chalk.blue(ENV_IMAGE)}`)
         const subSpool = spool.sub()
         ;(async () => {
             const tmpdir = tmp.dirSync({ mode: 0o750, prefix: "capsula-" })
@@ -217,7 +238,7 @@ const spool = new Spool()
             subSpool.roll(rcfile, (rcfile) => fs.promises.unlink(rcfile))
             await fs.promises.writeFile(rcfile, rawBash, { encoding: "utf8" })
 
-            await execa(docker, [
+            await exec(docker, [
                 "build",
                 "--progress", "plain",
                 "-t", ENV_IMAGE,
@@ -236,15 +257,16 @@ const spool = new Spool()
     }
 
     /*  create capsula volume  */
-    const volumeExists = await execa(docker, [ "volume", "inspect", ENV_VOLUME ], { stdio: "ignore" })
+    const volumeExists = await exec(docker, [ "volume", "inspect", ENV_VOLUME ], { stdio: "ignore" })
         .then(() => true).catch(() => false)
     if (!volumeExists) {
-        cli.log("info", "creating persistent volume")
-        await execa(docker, [ "volume", "create", ENV_VOLUME ], { stdio: "ignore" })
-            .catch((err) => { throw new Error(`failed to create persistent volume: ${err.message ?? err}`) })
+        cli.log("info", `creating persistent volume ${chalk.blue(ENV_VOLUME)}`)
+        await exec(docker, [ "volume", "create", ENV_VOLUME ], { stdio: "ignore" })
+            .catch((err: any) => { throw new Error(`failed to create persistent volume: ${err.message ?? err}`) })
     }
 
     /*  list of dotfiles to expose  */
+    //  FIXME
     const dotfiles = ".dotfiles .bashrc .bash_login .bash_logout .bash-fzf.rc " +
         ".ssh/config .ssh/known_hosts .ssh/authorized_keys " +
         ".tmux.conf .claude! .claude.json! .gitconfig .npmrc .vimrc .vim " +
@@ -269,8 +291,8 @@ const spool = new Spool()
     const gid = ui.gid.toString()
     const usr = ui.username
     await ensureTool("id")
-    const response = await execa("id", [ "-g", "-n" ], { stdio: [ "ignore", "pipe", "ignore" ] })
-        .catch((err) => { throw new Error(`failed to determine group name: ${err.message ?? err}`) })
+    const response = await exec("id", [ "-g", "-n" ], { stdio: [ "ignore", "pipe", "ignore" ] })
+        .catch((err: any) => { throw new Error(`failed to determine group name: ${err.message ?? err}`) })
     const grp = response.stdout.trim()
     const hostname = os.hostname()
     const subSpool = spool.sub()
@@ -301,7 +323,7 @@ const spool = new Spool()
         dotfiles,
         ...args._.map((x) => String(x))
     ]
-    const result = await execa(docker, opts, { stdio: "inherit" })
+    const result = await exec(docker, opts, { stdio: "inherit" })
 
     /*  cleanup resources  */
     await spool.unrollAll()
@@ -317,7 +339,7 @@ const spool = new Spool()
     if (cli !== null)
         cli.log("error", err.message ?? err)
     else
-        process.stderr.write(`rulebook: ERROR: ${err.message ?? err} ${err.stack}\n`)
+        process.stderr.write(`rulebook: ${chalk.red("ERROR")}: ${err.message ?? err} ${err.stack}\n`)
     await spool.unrollAll()
     process.exit(1)
 })
