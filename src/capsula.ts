@@ -19,12 +19,14 @@ import { execa, type Options } from "execa"
 import chalk                   from "chalk"
 import which                   from "which"
 import tmp                     from "tmp"
+import jsYAML                  from "yaml"
 
 /*  internal dependencies  */
 import pkg                     from "../package.json"                           with { type: "json"   }
 import rawDocker1              from "./capsula-container-debian.dockerfile?raw" with { type: "string" }
 import rawDocker2              from "./capsula-container-alpine.dockerfile?raw" with { type: "string" }
 import rawBash                 from "./capsula-container.bash?raw"              with { type: "string" }
+import rawDefaults             from "./capsula.yaml?raw"                        with { type: "string" }
 
 /*  helper class for resource spooling  */
 interface SpoolResource {
@@ -202,10 +204,19 @@ const spool = new Spool()
     if (!workdir.startsWith(`${home}${path.sep}`))
         throw new Error(`working directory ${chalk.blue(workdir)} not below home directory ${chalk.blue(home)}`)
 
+    /*  load configurations  */
+    let config = jsYAML.parse(rawDefaults)
+    const configfile = path.join(home, ".capsula.yaml")
+    if (fs.existsSync(configfile)) {
+        const yaml = fs.readFileSync(configfile, { encoding: "utf8" })
+        const obj = jsYAML.parse(yaml)
+        config = Object.assign({}, config, obj)
+    }
+
     /*  the temporary development environment image and container name  */
-    const ENV_IMAGE     = "capsula"
-    const ENV_CONTAINER = "capsula"
-    const ENV_VOLUME    = "capsula"
+    const ENV_IMAGE     = `capsula-${args.context}`
+    const ENV_CONTAINER = `capsula-${args.context}`
+    const ENV_VOLUME    = `capsula-${args.context}`
 
     /*  determine docker(1) compatible tool  */
     const haveDocker  = await existsTool("docker")
@@ -266,15 +277,10 @@ const spool = new Spool()
     }
 
     /*  list of dotfiles to expose  */
-    //  FIXME
-    const dotfiles = ".dotfiles .bashrc .bash_login .bash_logout .bash-fzf.rc " +
-        ".ssh/config .ssh/known_hosts .ssh/authorized_keys " +
-        ".tmux.conf .claude! .claude.json! .gitconfig .npmrc .vimrc .vim " +
-        ".cache!"
+    const dotfiles = config[args.context]?.dotfiles ?? config.default?.dotfiles ?? []
 
     /*  list of environment variables to expose  */
-    //  FIXME
-    const envvars = [ "TERM", "HOME" ]
+    const envvars = config[args.context]?.environment ?? config.default?.environment ?? []
 
     /*  determine "docker run" options for dotfiles  */
     let opts = []

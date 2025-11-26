@@ -29,7 +29,7 @@ export default Vite.defineConfig(({ command, mode }) => ({
         viteStaticCopy({
             hook: "buildStart",
             targets: [{
-                src: [ "src/*.dockerfile", "src/*.bash" ],
+                src: [ "src/*.dockerfile", "src/*.bash", "src/*.yaml" ],
                 dest: "../dst-stage1/",
                 overwrite: true
             }],
