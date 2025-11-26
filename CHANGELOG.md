@@ -8,6 +8,7 @@ ChangeLog
 - IMPROVEMENT: add platform to names
 - IMPROVEMENT: switch to info level by default
 - IMPROVEMENT: switch to plain non-node container images by default
+- IMPROVEMENT: improve platform handling
 
 0.9.6 (2025-11-27)
 ------------------
