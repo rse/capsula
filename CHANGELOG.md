@@ -5,8 +5,9 @@ ChangeLog
 0.9.6 (2025-11-26)
 ------------------
 
-- CLEANUP: cleanup usage documentation
 - IMPROVEMENT: allows dotfiles and environment to be configured
+- BUGFIX: fix building of container image
+- CLEANUP: cleanup usage documentation
 
 0.9.5 (2025-11-26)
 ------------------
