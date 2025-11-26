@@ -6,6 +6,7 @@ ChangeLog
 ------------------
 
 - CLEANUP: cleanup usage documentation
+- IMPROVEMENT: allows dotfiles and environment to be configured
 
 0.9.5 (2025-11-26)
 ------------------

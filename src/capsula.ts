@@ -74,6 +74,7 @@ const spool = new Spool()
         .usage("Usage: capsula " +
             "[-h|--help] " +
             "[-v|--version] " +
+            "[-f|--config <config>] " +
             "[-l|--log-level <level>] " +
             "[-p|--platform <platform>] " +
             "[-d|--docker <docker>] " +
@@ -88,6 +89,14 @@ const spool = new Spool()
             coerce,
             default:  false,
             describe: "show program version"
+        })
+        .option("config", {
+            alias:    "f",
+            type:     "string",
+            array:    false,
+            coerce,
+            default:  path.join(os.homedir(), ".capsula.yaml"),
+            describe: "set context configuration file"
         })
         .option("log-level", {
             alias:    "l",
@@ -205,12 +214,11 @@ const spool = new Spool()
         throw new Error(`working directory ${chalk.blue(workdir)} not below home directory ${chalk.blue(home)}`)
 
     /*  load configurations  */
-    let config = jsYAML.parse(rawDefaults)
-    const configfile = path.join(home, ".capsula.yaml")
-    if (fs.existsSync(configfile)) {
-        const yaml = fs.readFileSync(configfile, { encoding: "utf8" })
+    const config = jsYAML.parse(rawDefaults)
+    if (fs.existsSync(args.config)) {
+        const yaml = fs.readFileSync(args.config, { encoding: "utf8" })
         const obj = jsYAML.parse(yaml)
-        config = Object.assign({}, config, obj)
+        Object.assign(config, obj)
     }
 
     /*  the temporary development environment image and container name  */
@@ -284,7 +292,7 @@ const spool = new Spool()
 
     /*  determine "docker run" options for dotfiles  */
     let opts = []
-    for (let dotfile of dotfiles.split(" ")) {
+    for (let dotfile of dotfiles) {
         let ro = true
         if (dotfile.endsWith("!")) {
             ro = false
@@ -294,6 +302,9 @@ const spool = new Spool()
         const mountOption = ro ? ":ro" : ""
         opts.push("-v", `${dotfilePath}:/mnt/fs-home${dotfilePath}${mountOption}`)
     }
+    const dotfileInfo = dotfiles.join(" ")
+
+    /*  determine "docker run" options for environment variables  */
     for (const envvar of envvars)
         opts.push("-e", envvar)
 
@@ -331,7 +342,7 @@ const spool = new Spool()
         grp, gid,
         home,
         workdir,
-        dotfiles,
+        dotfileInfo,
         ...args._.map((x) => String(x))
     ]
     const result = await exec(docker, opts, { stdio: "inherit" })

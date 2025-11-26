@@ -6,6 +6,7 @@
 `capsula`
 \[`-h`|`--help`\]
 \[`-v`|`--version`\]
+\[`-f`|`--config` *config*\]
 \[`-l`|`--log-level` *level*\]
 \[`-p`|`--platform` *platform*\]
 \[`-d`|`--docker` *docker*\]
@@ -32,6 +33,10 @@ The following command-line options and arguments exist to the `capsula(1)` comma
 - \[`-v`|`--version`\]:
   Show program version information only.
 
+- \[`-f`|`--config` *config*\]:
+  For context configurations, read the custom file instead
+  of the default `$HOME/.capsula.yaml` file.
+
 - \[`-l`|`--log-level` *level*\]:
   Set the logging level: `error`, `warning`, `info` or `debug`.
 
@@ -45,11 +50,38 @@ The following command-line options and arguments exist to the `capsula(1)` comma
 
 - \[`-c`|`--context` *context*\]:
   Use a certain context for naming the Docker container and volume.
-  This allows to use separate encapsulations in parallel.
+  This allows to use separate encapsulations in parallel. The
+  default context is named `default`.
 
 - \[*command* ...\]:
   Execute the particular command inside the Linux Docker container.
   If missing, `bash`(1) is called.
+
+## CONFIGURATION
+
+The following is the default context configuration:
+
+```yaml
+default:
+    environment:
+        - TERM
+        - HOME
+    dotfiles:
+        - .bash_login
+        - .bash_logout
+        - .bashrc
+        - .ssh/config
+        - .ssh/authorized_keys
+        - .ssh/known_hosts
+        - .vim
+        - .vimrc
+        - .tmux.conf
+        - .gitconfig
+        - .npmrc
+        - .cache!
+```
+
+An overriding custom configuration file can be given with option `-f`/`--config`.
 
 ## EXAMPLE
 

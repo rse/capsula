@@ -7,20 +7,16 @@ default:
         - TERM
         - HOME
     dotfiles:
-        - .dotfiles
-        - .bashrc
         - .bash_login
         - .bash_logout
-        - .bash-fzf.rc
+        - .bashrc
         - .ssh/config
-        - .ssh/known_hosts
         - .ssh/authorized_keys
+        - .ssh/known_hosts
+        - .vim
+        - .vimrc
         - .tmux.conf
-        - .claude!
-        - .claude.json!
         - .gitconfig
         - .npmrc
-        - .vimrc
-        - .vim
         - .cache!
 
