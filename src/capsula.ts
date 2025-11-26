@@ -222,7 +222,7 @@ const spool = new Spool()
     }
 
     /*  the temporary development environment image and container name  */
-    const ENV_IMAGE     = `capsula-${args.context}`
+    const ENV_IMAGE     = `capsula-${args.context}:latest`
     const ENV_CONTAINER = `capsula-${args.context}`
     const ENV_VOLUME    = `capsula-${args.context}`
 
@@ -240,9 +240,8 @@ const spool = new Spool()
     cli.log("debug", `docker command: ${chalk.blue(docker)}`)
 
     /*  build development environment image  */
-    const imageExists = await exec(docker, [ "images", "-q", ENV_IMAGE ], { stdio: "ignore" })
-        .then(() => true).catch(() => false)
-    if (!imageExists) {
+    const imageId = await exec(docker, [ "images", "-q", ENV_IMAGE ], { stdio: [ "ignore", "pipe", "ignore" ] })
+    if ((imageId.stdout ?? "") === "") {
         cli.log("info", `building development environment container image ${chalk.blue(ENV_IMAGE)}`)
         const subSpool = spool.sub()
         ;(async () => {
