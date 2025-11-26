@@ -21,6 +21,7 @@ import which                   from "which"
 import tmp                     from "tmp"
 import jsYAML                  from "yaml"
 import Ora                     from "ora"
+import { DateTime }            from "luxon"
 
 /*  internal dependencies  */
 import pkg                     from "../package.json"                           with { type: "json"   }
@@ -201,10 +202,11 @@ const spool = new Spool()
         Object.assign(config, obj)
     }
 
-    /*  the container image, container and volume  */
-    const nameImage     = `capsula-${args.context}:latest`
-    const nameContainer = `capsula-${args.context}`
-    const nameVolume    = `capsula-${args.context}`
+    /*  define the container volume, container image and container names  */
+    const username      = os.userInfo().username
+    const nameVolume    = `capsula-${username}-${args.context}`
+    const nameImage     = `capsula-${username}-${args.context}:${pkg.version}`
+    const nameContainer = `capsula-${username}-${args.context}-${DateTime.now().toFormat("yyyy-MM-dd-HH-mm-ss-SSS")}`
 
     /*  determine docker(1) compatible tool  */
     const haveDocker  = await existsTool("docker")
