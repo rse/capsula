@@ -106,7 +106,7 @@ const spool = new Spool()
             nargs:    1,
             array:    false,
             coerce,
-            default:  "warning",
+            default:  "info",
             choices:  [ "error", "warning", "info", "debug" ] as const,
             describe: "set logging level"
         })
