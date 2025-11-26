@@ -2,7 +2,7 @@
 ChangeLog
 =========
 
-0.9.6 (2025-11-26)
+0.9.6 (2025-11-27)
 ------------------
 
 - IMPROVEMENT: allows dotfiles and environment to be configured
