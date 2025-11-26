@@ -7,7 +7,7 @@
 ##
 
 #   derive image from a certain base image
-FROM        node:24-alpine
+FROM        alpine:3.22
 
 #   switch working directory
 WORKDIR     /
@@ -24,7 +24,10 @@ RUN         apk add \
 
 #   install additional tools
 RUN         apk add \
-                sudo bash less mandoc man-pages man-pages-posix vim procps net-tools htop gnupg lsof strace shadow coreutils
+                shadow coreutils \
+                sudo bash less tmux vim \
+                procps net-tools htop lsof strace \
+                mandoc man-pages man-pages-posix
 
 #   reconfigure Alpine for EN/DE and ISO-Latin1/UTF8
 RUN         apk add musl-locales musl-locales-lang && \

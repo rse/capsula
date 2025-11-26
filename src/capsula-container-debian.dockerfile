@@ -7,13 +7,12 @@
 ##
 
 #   derive image from a certain base image
-FROM        node:24-trixie
+FROM        debian:13
 
 #   switch working directory
 WORKDIR     /
 
 #   prepare
-ENV         DEBIAN_FRONTEND=noninteractive
 RUN         apt-get update
 
 #   update Debian to latest patch-level
@@ -25,7 +24,9 @@ RUN         apt-get install -y --no-install-recommends \
 
 #   install additional tools
 RUN         apt-get install -y --no-install-recommends \
-                sudo bash less man manpages vim procps net-tools htop gnupg lsof strace
+                sudo bash less tmux vim \
+                procps net-tools htop lsof strace \
+                man manpages
 
 #   reconfigure Debian for EN/DE and ISO-Latin1/UTF8
 RUN         apt-get install -y --no-install-recommends locales && \
