@@ -138,6 +138,7 @@ const spool = new Spool()
         .showHelpOnFail(true)
         .strict()
         .demandCommand(0)
+        .parserConfiguration({ "halt-at-non-option": true })
         .parse(hideBin(process.argv))
 
     /*  short-circuit printing of program version  */

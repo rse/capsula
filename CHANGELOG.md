@@ -7,6 +7,7 @@ ChangeLog
 
 - IMPROVEMENT: allows dotfiles and environment to be configured
 - BUGFIX: fix building of container image
+- BUGFIX: stop parsing command-line options on first non-option
 - CLEANUP: cleanup usage documentation
 - CLEANUP: remove no longer needed base directory calculation
 
