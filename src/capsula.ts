@@ -163,6 +163,8 @@ const spool = new Spool()
         const options = []
         if (opts.cwd)
             options.push(`cwd: ${chalk.blue(opts.cwd)}`)
+        if (opts.all)
+            options.push(`all: ${chalk.blue(opts.all)}`)
         if (opts.stdio)
             options.push(`stdio: ${chalk.blue(JSON.stringify(opts.stdio))}`)
         cli!.log("debug", `executing command: $ ${chalk.bold(str)}` +
