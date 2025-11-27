@@ -114,7 +114,6 @@ fi
 #   grant access to home directory
 chown $usr:$grp "$homedir"
 
-
 #   implicitly change current working directory
 cd "$workdir"
 
