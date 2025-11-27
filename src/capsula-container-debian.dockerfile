@@ -24,7 +24,7 @@ RUN         apt-get install -y --no-install-recommends \
 
 #   install additional tools
 RUN         apt-get install -y --no-install-recommends \
-                sudo bash less tmux vim \
+                sudo bash less tmux vim curl \
                 procps net-tools htop lsof strace \
                 man manpages
 
