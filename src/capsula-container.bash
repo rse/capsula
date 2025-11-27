@@ -126,7 +126,6 @@ cd "$workdir"
 #   pass-through execution
 if [[ $# -eq 0 ]]; then
     #   enter an interactive shell
-    #   FIXME: env vars?
     exec sudo -n "--preserve-env=$preserve" -g "$grp" -u "$usr" $SHELL -i
 else
     #   execute batch command
