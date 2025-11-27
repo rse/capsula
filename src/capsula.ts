@@ -71,7 +71,8 @@ const spool = new Spool()
     tmp.setGracefulCleanup()
 
     /*  parse command-line arguments  */
-    const coerce = (arg: string) => Array.isArray(arg) ? arg[arg.length - 1] : arg
+    const coerceS = (arg: any) => Array.isArray(arg) ? arg[arg.length - 1] : arg
+    const coerceA = (arg: any) => Array.isArray(arg) ? arg : [ arg ]
     const args = await yargs()
         .usage("Usage: capsula " +
             "[-h|--help] " +
@@ -88,16 +89,14 @@ const spool = new Spool()
         .option("version", {
             alias:    "v",
             type:     "boolean",
-            array:    false,
-            coerce,
+            coerce:   coerceS,
             default:  false,
             describe: "show program version"
         })
         .option("config", {
             alias:    "f",
             type:     "string",
-            array:    false,
-            coerce,
+            coerce:   coerceS,
             default:  path.join(os.homedir(), ".capsula.yaml"),
             describe: "set context configuration file"
         })
@@ -105,8 +104,7 @@ const spool = new Spool()
             alias:    "l",
             type:     "string",
             nargs:    1,
-            array:    false,
-            coerce,
+            coerce:   coerceS,
             default:  "info",
             choices:  [ "error", "warning", "info", "debug" ] as const,
             describe: "set logging level"
@@ -114,8 +112,7 @@ const spool = new Spool()
         .option("platform", {
             alias:    "p",
             type:     "string",
-            array:    false,
-            coerce,
+            coerce:   coerceS,
             default:  "debian",
             choices:  [ "debian", "alpine" ] as const,
             describe: "set Linux platform (\"debian\" or \"alpine\")"
@@ -123,24 +120,22 @@ const spool = new Spool()
         .option("docker", {
             alias:    "d",
             type:     "string",
-            array:    false,
-            coerce,
+            coerce:   coerceS,
             default:  "",
             describe: "set docker(1) compatible tool"
         })
         .option("context", {
             alias:    "c",
             type:     "string",
-            array:    false,
             nargs:    1,
+            coerce:   coerceS,
             default:  "default",
             describe: "unique context name"
         })
         .option("sudo", {
             alias:    "s",
             type:     "boolean",
-            array:    false,
-            coerce,
+            coerce:   coerceS,
             default:  false,
             describe: "enable sudo(8) for user in container"
         })
