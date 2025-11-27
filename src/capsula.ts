@@ -362,6 +362,7 @@ const spool = new Spool()
 
         /*  entrypoint arguments  */
         nameImage,
+        args.platform,
         hostname,
         usr, uid,
         grp, gid,

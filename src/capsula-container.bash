@@ -6,6 +6,7 @@
 ##
 
 #   take over parameters
+platform="$1"; shift
 hostname="$1"; shift
 usr="$1";      shift
 uid="$1";      shift
@@ -78,17 +79,11 @@ cd /mnt/fs-root
 pivot_root . fs-root-old
 umount -l /fs-root-old
 
-#   provide hint about platform
-if [[ -f /etc/alpine-release ]]; then
-    PLATFORM="alpine"
-elif [[ -f /etc/debian_version ]]; then
-    PLATFORM="debian"
-fi
-export PLATFORM
-
-#   provide hint about environment
+#   provide hint about environment and platform
 ENVIRONMENT="capsula"
 export ENVIRONMENT
+PLATFORM="$platform"
+export PLATFORM
 
 #   enforce shell
 SHELL=/bin/bash
@@ -99,9 +94,9 @@ if ! getent group $grp >/dev/null 2>&1; then
     groupadd -f -g $gid $grp
 fi
 if ! getent passwd $usr >/dev/null 2>&1; then
-    if [[ -f /etc/alpine-release ]]; then
+    if [[ $platform == "alpine" ]]; then
         useradd -M -d $homedir -s $SHELL -u $uid -g $grp -G wheel $usr >/dev/null 2>&1
-    elif [[ -f /etc/debian_version ]]; then
+    elif [[ $platform == "debian" ]]; then
         useradd -M -d $homedir -s $SHELL -u $uid -g $grp -G sudo $usr
     fi
 fi

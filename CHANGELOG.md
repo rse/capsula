@@ -2,6 +2,11 @@
 ChangeLog
 =========
 
+0.9.8 (2025-11-27)
+------------------
+
+- IMPROVEMENT: be more precise on platform detection inside container
+
 0.9.7 (2025-11-27)
 ------------------
 
