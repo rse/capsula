@@ -6,7 +6,8 @@ ChangeLog
 ------------------
 
 - IMPROVEMENT: be more precise on platform detection inside container
-- IMPROVEMENT: add options -s|--sudo to enable sudo(8) for user in container
+- IMPROVEMENT: add option -s|--sudo to enable sudo(8) for user in container
+- IMPROVEMENT: add option -e|--env to pass environment variable to container
 
 0.9.7 (2025-11-27)
 ------------------

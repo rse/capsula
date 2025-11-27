@@ -64,6 +64,7 @@ $ `capsula`
 \[`-d`|`--docker` *docker*\]
 \[`-c`|`--context` *context*\]
 \[`-s`|`--sudo`\]
+\[`-e`|`--env` *variable*\]
 \[*command* ...\]
 
 The particular command-line options and arguments are:
@@ -96,6 +97,9 @@ The particular command-line options and arguments are:
 
 - \[`-s`|`--sudo`\]:
   Enable sudo(8) for user in container.
+
+- \[`-e`|`--env` *variable*\]:
+  Pass environment variable to encapsulated command.
 
 - \[*command* ...\]:
   Execute the particular command inside the Linux Docker container.

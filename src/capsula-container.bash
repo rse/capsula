@@ -15,6 +15,7 @@ gid="$1";      shift
 homedir="$1";  shift
 workdir="$1";  shift
 dotfiles="$1"; shift
+envvars="$1";  shift
 sudo="$1";     shift
 
 #   implicitly change hostname
@@ -90,6 +91,9 @@ export PLATFORM
 SHELL=/bin/bash
 export SHELL
 
+#   determine list of environment variables to pass-through
+preserve="ENVIRONMENT,PLATFORM,SHELL,$(echo "$envvars" | sed -e 's; ;,;g')"
+
 #   provide same user/group as on host
 if ! getent group $grp >/dev/null 2>&1; then
     groupadd -f -g $gid $grp
@@ -123,9 +127,9 @@ cd "$workdir"
 if [[ $# -eq 0 ]]; then
     #   enter an interactive shell
     #   FIXME: env vars?
-    exec sudo -n "--preserve-env=ENVIRONMENT,PLATFORM,SHELL" -g "$grp" -u "$usr" $SHELL -i
+    exec sudo -n "--preserve-env=$preserve" -g "$grp" -u "$usr" $SHELL -i
 else
     #   execute batch command
-    exec sudo -n "--preserve-env=ENVIRONMENT,PLATFORM,SHELL" -g "$grp" -u "$usr" "$@"
+    exec sudo -n "--preserve-env=$preserve" -g "$grp" -u "$usr" "$@"
 fi
 
