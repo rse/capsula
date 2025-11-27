@@ -81,6 +81,7 @@ const spool = new Spool()
             "[-p|--platform <platform>] " +
             "[-d|--docker <docker>] " +
             "[-c|--context <context>] " +
+            "[-s|--sudo] " +
             "[<command> ...]"
         )
         .version(false)
@@ -134,6 +135,14 @@ const spool = new Spool()
             nargs:    1,
             default:  "default",
             describe: "unique context name"
+        })
+        .option("sudo", {
+            alias:    "s",
+            type:     "boolean",
+            array:    false,
+            coerce,
+            default:  false,
+            describe: "enable sudo(8) for user in container"
         })
         .help("h", "show usage help")
         .alias("h", "help")
@@ -369,6 +378,7 @@ const spool = new Spool()
         home,
         workdir,
         dotfileInfo,
+        args.sudo ? "yes" : "false",
 
         /*  command to execute  */
         ...args._.map((x) => String(x))

@@ -63,6 +63,7 @@ $ `capsula`
 \[`-p`|`--platform` *platform*\]
 \[`-d`|`--docker` *docker*\]
 \[`-c`|`--context` *context*\]
+\[`-s`|`--sudo`\]
 \[*command* ...\]
 
 The particular command-line options and arguments are:
@@ -92,6 +93,9 @@ The particular command-line options and arguments are:
   Use a certain context for naming the Docker container and volume.
   This allows to use separate encapsulations in parallel. The
   default context is named `default`.
+
+- \[`-s`|`--sudo`\]:
+  Enable sudo(8) for user in container.
 
 - \[*command* ...\]:
   Execute the particular command inside the Linux Docker container.

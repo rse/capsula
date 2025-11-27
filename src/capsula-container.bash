@@ -15,6 +15,7 @@ gid="$1";      shift
 homedir="$1";  shift
 workdir="$1";  shift
 dotfiles="$1"; shift
+sudo="$1";     shift
 
 #   implicitly change hostname
 if [[ ! "$hostname" =~ ^[a-zA-Z0-9._-]+$ ]]; then
@@ -102,9 +103,11 @@ if ! getent passwd $usr >/dev/null 2>&1; then
 fi
 
 #   allows user to switch to superuser
-if [[ ! -f "/etc/sudoers.d/$usr" ]]; then
-    echo "$usr ALL=(ALL:ALL) NOPASSWD: ALL" >"/etc/sudoers.d/$usr"
-    chmod 440 "/etc/sudoers.d/$usr"
+if [[ $sudo == "yes" ]]; then
+    echo "$usr ALL=(ALL:ALL) NOPASSWD: ALL" >"/etc/sudoers.d/capsula"
+    chmod 440 "/etc/sudoers.d/capsula"
+else
+    rm -f "/etc/sudoers.d/capsula"
 fi
 
 #   grant access to home directory
