@@ -93,14 +93,27 @@ An overriding custom configuration file can be given with option `-f`/`--config`
 
 ## EXAMPLE
 
+The following installs *Node.js* and establishes a global package
+environment for the user inside an encapsulated environment:
+
+```sh
+$ capsula -s sudo apt update
+$ capsula -s bash -c \
+  "curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -"
+$ capsula -s sudo apt install -y nodejs
+$ NPM=/npm
+$ export NPM_CONFIG_PREFIX=$NPM
+$ export NPM_CONFIG_CACHE=$NPM/.cache
+$ capsula -e NPM -s sudo bash -c 'mkdir $NPM && chown $USER:$GROUP $NPM'
+```
+
 The following installs and runs *Claude Code* inside an encapsulated
 environment:
 
 ```sh
-$ capsula apt update
-$ capsula apt install -y nodejs
-$ capsula npm install -g @anthropic-ai/claude-code
-$ capsula claude
+$ capsula -e NPM_CONFIG_PREFIX -e NPM_CONFIG_CACHE \
+  npm install -g @anthropic-ai/claude-code
+$ capsula /npm/bin/claude
 ```
 
 ## DESIGN
