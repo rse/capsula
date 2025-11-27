@@ -72,9 +72,6 @@ done
 mkdir -p "/mnt/fs-root$workdir"
 mount --move "/mnt/fs-work$workdir" "/mnt/fs-root$workdir"
 
-#   remount custom Docker bind mount for volume
-mount --move /mnt/fs-volume /mnt/fs-root/mnt/fs-volume
-
 #   switch root filesystem
 mkdir -p /mnt/fs-root/fs-root-old
 cd /mnt/fs-root
@@ -117,8 +114,6 @@ fi
 #   grant access to home directory
 chown $usr:$grp "$homedir"
 
-#   FIXME: npm config set prefix /volume/npm
-#   FIXME: npm config set cache /volume/npm/.cache
 
 #   implicitly change current working directory
 cd "$workdir"
