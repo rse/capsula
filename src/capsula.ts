@@ -355,7 +355,7 @@ const spool = new Spool()
     await fs.promises.writeFile(rcfile, rawBash, { mode: 0o750, encoding: "utf8" })
 
     /*  execute command inside encapsulating container  */
-    const result = await exec(docker, [
+    const result = exec(docker, [
         /*  standard arguments  */
         "run",
         "--rm",
@@ -383,16 +383,15 @@ const spool = new Spool()
         /*  command to execute  */
         ...args._.map((x) => String(x))
     ], { stdio: "inherit" })
+    result.on("exit", async (code) => {
+        /*  cleanup resources  */
+        await spool.unrollAll()
 
-    /*  cleanup resources  */
-    await spool.unrollAll()
-
-    /*  terminate gracefully  */
-    if (result.exitCode !== 0) {
-        cli.log("warning", `failed to execute: ${result.stderr}`)
-        process.exit(result.exitCode)
-    }
-    process.exit(0)
+        /*  terminate gracefully  */
+        if (code !== 0)
+            cli!.log("warning", `encapsulated command terminated with ${chalk.red("error")} exit code ${chalk.red(code)}`)
+        process.exit(code)
+    })
 })().catch(async (err) => {
     /*  cleanup resources and terminate ungracefully  */
     if (cli !== null)
