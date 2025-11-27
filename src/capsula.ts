@@ -139,6 +139,13 @@ const spool = new Spool()
             default:  false,
             describe: "enable sudo(8) for user in container"
         })
+        .option("env", {
+            alias:    "e",
+            type:     "string",
+            coerce:   coerceA,
+            default:  [],
+            describe: "pass environment variable to encapsulated command"
+        })
         .help("h", "show usage help")
         .alias("h", "help")
         .showHelpOnFail(true)
@@ -322,11 +329,12 @@ const spool = new Spool()
         const mountOption = ro ? ":ro" : ""
         opts.push("-v", `${dotfilePath}:/mnt/fs-home${dotfilePath}${mountOption}`)
     }
-    const dotfileInfo = dotfiles.join(" ")
 
     /*  determine "docker run" options for environment variables  */
-    for (const envvar of envvars)
-        opts.push("-e", envvar)
+    for (const name of args.env)
+        envvars.push(name)
+    for (const name of envvars)
+        opts.push("-e", name)
 
     /*  determine user/group information  */
     const ui = os.userInfo()
@@ -353,15 +361,15 @@ const spool = new Spool()
     const result = exec(docker, [
         /*  standard arguments  */
         "run",
-        "--rm",
+        "--name", nameContainer,
         "--privileged",
+        "--rm",
         "-i",
         ...((process.stdin.isTTY ?? false) ? [ "-t" ] : []),
         ...opts,
         "-v", `${rcfile}:/etc/capsula-container:ro`,
         "-v", `${workdir}:/mnt/fs-work${workdir}`,
         "-v", `${nameVolume}:/mnt/fs-volume`,
-        "--name", nameContainer,
         "--entrypoint", "/etc/capsula-container",
 
         /*  entrypoint arguments  */
@@ -372,7 +380,8 @@ const spool = new Spool()
         grp, gid,
         home,
         workdir,
-        dotfileInfo,
+        dotfiles.join(" "),
+        envvars.join(" "),
         args.sudo ? "yes" : "false",
 
         /*  command to execute  */
