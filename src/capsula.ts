@@ -410,7 +410,7 @@ const spool = new Spool()
     if (cli !== null)
         cli.log("error", err.message ?? err)
     else
-        process.stderr.write(`rulebook: ${chalk.red("ERROR")}: ${err.message ?? err} ${err.stack}\n`)
+        process.stderr.write(`capsula: ${chalk.red("ERROR")}: ${err.message ?? err} ${err.stack}\n`)
     await spool.unrollAll()
     process.exit(1)
 })
