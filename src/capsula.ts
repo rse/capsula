@@ -34,18 +34,18 @@ import rawBash                 from "./capsula-container.bash?raw"              
 import rawDefaults             from "./capsula.yaml?raw"                        with { type: "string" }
 
 /*  helper class for resource spooling  */
-interface SpoolResource {
-    resource: any,
-    onUnroll: (resource: any) => void | Promise<void>
+interface SpoolResource<T = unknown> {
+    resource: T,
+    onUnroll: (resource: T) => void | Promise<void>
 }
 class Spool {
-    private resources: SpoolResource[] = []
+    private resources: SpoolResource<unknown>[] = []
     roll<T> (resource: T, onUnroll: (resource: T) => void | Promise<void>) {
-        this.resources.push({ resource, onUnroll } satisfies SpoolResource)
+        this.resources.push({ resource, onUnroll } satisfies SpoolResource<T> as SpoolResource<unknown>)
     }
     sub () {
         const spool = new Spool()
-        this.roll(spool, (spool) => { spool.unroll() })
+        this.roll(spool, async (spool) => { await spool.unrollAll() })
         return spool
     }
     async unroll () {
