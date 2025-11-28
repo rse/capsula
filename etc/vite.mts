@@ -47,7 +47,7 @@ export default Vite.defineConfig(({ command, mode }) => ({
         lib: {
             entry:    "dst-stage1/capsula.js",
             formats:  [ "cjs" ],
-            name:     "Rundown",
+            name:     "Capsula",
             fileName: () => "capsula.js"
         },
         target:                 "esnext",
