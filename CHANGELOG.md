@@ -5,8 +5,9 @@ ChangeLog
 0.9.9 (2025-11-28)
 ------------------
 
-- IMPROVEMENT: add Ubuntu platform support
-- IMPROVEMENT: add AlmaLinux platform support
+- IMPROVEMENT: add Ubuntu Linux platform support
+- IMPROVEMENT: add Alma Linux platform support
+- IMPROVEMENT: add Arch Linux platform support
 
 0.9.8 (2025-11-27)
 ------------------

@@ -98,11 +98,9 @@ if ! getent group $grp >/dev/null 2>&1; then
 fi
 if ! getent passwd $usr >/dev/null 2>&1; then
     if [[ $platform == "alpine" ]]; then
-        useradd -M -d $homedir -s $SHELL -u $uid -g $grp -G wheel $usr >/dev/null 2>&1
-    elif [[ $platform == "debian" || $platform == "ubuntu" ]]; then
-        useradd -M -d $homedir -s $SHELL -u $uid -g $grp -G sudo $usr
-    elif [[ $platform == "alma" ]]; then
-        useradd -M -d $homedir -s $SHELL -u $uid -g $grp -G wheel $usr
+        useradd -M -d $homedir -s $SHELL -u $uid -g $grp $usr >/dev/null 2>&1
+    elif
+        useradd -M -d $homedir -s $SHELL -u $uid -g $grp $usr
     fi
 fi
 

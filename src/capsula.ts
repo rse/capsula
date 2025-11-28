@@ -29,6 +29,7 @@ import rawDocker1              from "./capsula-container-alpine.dockerfile?raw" 
 import rawDocker2              from "./capsula-container-debian.dockerfile?raw" with { type: "string" }
 import rawDocker3              from "./capsula-container-ubuntu.dockerfile?raw" with { type: "string" }
 import rawDocker4              from "./capsula-container-alma.dockerfile?raw"   with { type: "string" }
+import rawDocker5              from "./capsula-container-arch.dockerfile?raw"   with { type: "string" }
 import rawBash                 from "./capsula-container.bash?raw"              with { type: "string" }
 import rawDefaults             from "./capsula.yaml?raw"                        with { type: "string" }
 
@@ -116,8 +117,8 @@ const spool = new Spool()
             type:     "string",
             coerce:   coerceS,
             default:  "debian",
-            choices:  [ "alpine", "debian", "ubuntu", "alma" ] as const,
-            describe: "set Linux platform (\"alpine\", \"debian\", \"ubuntu\", or \"alma\")"
+            choices:  [ "alpine", "debian", "ubuntu", "alma", "arch" ] as const,
+            describe: "set Linux platform (\"alpine\", \"debian\", \"ubuntu\", \"alma\", or \"arch\")"
         })
         .option("docker", {
             alias:    "d",
@@ -250,7 +251,8 @@ const spool = new Spool()
                 args.platform === "alpine" ? rawDocker1 :
                     args.platform === "debian" ? rawDocker2 :
                         args.platform === "ubuntu" ? rawDocker3 :
-                            args.platform === "alma" ? rawDocker4 : ""
+                            args.platform === "alma" ? rawDocker4 :
+                                args.platform === "arch" ? rawDocker5 : ""
             await fs.promises.writeFile(dockerfile, dockerfileText, { encoding: "utf8" })
 
             const rcfile = path.join(tmpdir.name, "capsula-container.bash")
