@@ -26,7 +26,7 @@ RUN         pacman -S --noconfirm \
 
 #   reconfigure Arch for EN/DE and UTF8
 RUN         pacman -S --noconfirm glibc glibc-locales && \
-            sed -e 's;^#\(en_US\.UTF-8 UTF-8\);\1;' \
+            sed -i -e 's;^#\(en_US\.UTF-8 UTF-8\);\1;' \
                 -e 's;^#\(en_US ISO-8859-1\);\1;' \
                 -e 's;^#\(de_DE\.UTF-8 UTF-8\);\1;' \
                 -e 's;^#\(de_DE ISO-8859-1\);\1;' \
