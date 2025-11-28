@@ -65,7 +65,7 @@ class Spool {
 /*  central CLI context  */
 let cli: CLIio | null = null
 
-/*  centeral resource spool  */
+/*  central resource spool  */
 const spool = new Spool()
 
 /*  establish asynchronous environment  */
@@ -233,7 +233,7 @@ const spool = new Spool()
                 havePodman ? "podman" : (
                     haveRancher ? "nerdctl" : ""))))
     if (docker === "")
-        throw new Error("neither docker(1), podman(1) or nerctl(1) command found in shell path")
+        throw new Error("neither docker(1), podman(1) or nerdctl(1) command found in shell path")
     cli.log("debug", `docker command: ${chalk.blue(docker)}`)
 
     /*  build development environment image  */
@@ -265,7 +265,7 @@ const spool = new Spool()
                 if (args.logLevel === "info") {
                     spinner = Ora()
                     spinner.color = "red"
-                    spinner.prefixText = "capsule: INFO:"
+                    spinner.prefixText = "capsula: INFO:"
                     spinner.spinner = "dots"
                     subSpool.roll(spinner, (spinner) => { spinner.stop() })
                 }
