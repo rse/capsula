@@ -6,6 +6,7 @@ ChangeLog
 ------------------
 
 - IMPROVEMENT: add Ubuntu platform support
+- IMPROVEMENT: add AlmaLinux platform support
 
 0.9.8 (2025-11-27)
 ------------------
