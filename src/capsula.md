@@ -44,7 +44,7 @@ The following command-line options and arguments exist to the `capsula(1)` comma
 
 - \[`-p`|`--platform` *platform*\]:
   Use a certain Linux platform for the Docker container.
-  Currently `alpine`, `debian` and `ubuntu` are supported.
+  Currently `alpine`, `debian`, `ubuntu`, and `alma` are supported.
 
 - \[`-d`|`--docker` *docker*\]:
   Use a certain `docker`(1) compatible command for access
