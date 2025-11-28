@@ -59,7 +59,7 @@ for dotfile in $dotfiles; do
     if [[ -d "/mnt/fs-home$homedir/$dotfile" ]]; then
         mkdir -p "/mnt/fs-root$homedir/$dotfile"
     elif [[ -f "/mnt/fs-home$homedir/$dotfile" ]]; then
-        mkdir -p $(dirname "/mnt/fs-root$homedir/$dotfile")
+        mkdir -p "$(dirname "/mnt/fs-root$homedir/$dotfile")"
         touch "/mnt/fs-root$homedir/$dotfile"
     else
         echo "capsula: WARNING: dot-path \"$dotfile\" neither directory nor file" 1>&2
@@ -99,7 +99,7 @@ fi
 if ! getent passwd $usr >/dev/null 2>&1; then
     if [[ $platform == "alpine" ]]; then
         useradd -M -d $homedir -s $SHELL -u $uid -g $grp $usr >/dev/null 2>&1
-    elif
+    else
         useradd -M -d $homedir -s $SHELL -u $uid -g $grp $usr
     fi
 fi
