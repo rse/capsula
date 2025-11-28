@@ -30,7 +30,7 @@ RUN         dnf install -y --allowerasing \
                 procps-ng net-tools htop lsof strace \
                 man-db man-pages
 
-#   reconfigure Debian for EN/DE and ISO-Latin1/UTF8
+#   reconfigure AlmaLinux for EN/DE and ISO-Latin1/UTF8
 RUN         dnf install -y glibc-langpack-en glibc-langpack-de glibc-locale-source && \
             localedef -i en_US -f ISO-8859-1 en_US && \
             localedef -i en_US -f ISO-8859-15 en_US.ISO-8859-15 && \
