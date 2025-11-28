@@ -391,7 +391,7 @@ const spool = new Spool()
         workdir,
         dotfiles.join(" "),
         envvars.join(" "),
-        args.sudo ? "yes" : "false",
+        args.sudo ? "yes" : "no",
 
         /*  command to execute  */
         ...args._.map((x) => String(x))
