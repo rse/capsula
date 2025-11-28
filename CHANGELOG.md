@@ -2,6 +2,11 @@
 ChangeLog
 =========
 
+0.9.9 (2025-11-28)
+------------------
+
+- IMPROVEMENT: add Ubuntu platform support
+
 0.9.8 (2025-11-27)
 ------------------
 

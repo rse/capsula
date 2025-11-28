@@ -25,8 +25,9 @@ import { DateTime }            from "luxon"
 
 /*  internal dependencies  */
 import pkg                     from "../package.json"                           with { type: "json"   }
-import rawDocker1              from "./capsula-container-debian.dockerfile?raw" with { type: "string" }
-import rawDocker2              from "./capsula-container-alpine.dockerfile?raw" with { type: "string" }
+import rawDocker1              from "./capsula-container-alpine.dockerfile?raw" with { type: "string" }
+import rawDocker2              from "./capsula-container-debian.dockerfile?raw" with { type: "string" }
+import rawDocker3              from "./capsula-container-ubuntu.dockerfile?raw" with { type: "string" }
 import rawBash                 from "./capsula-container.bash?raw"              with { type: "string" }
 import rawDefaults             from "./capsula.yaml?raw"                        with { type: "string" }
 
@@ -114,8 +115,8 @@ const spool = new Spool()
             type:     "string",
             coerce:   coerceS,
             default:  "debian",
-            choices:  [ "debian", "alpine" ] as const,
-            describe: "set Linux platform (\"debian\" or \"alpine\")"
+            choices:  [ "alpine", "debian", "ubuntu" ] as const,
+            describe: "set Linux platform (\"alpine\", \"debian\" or \"ubuntu\")"
         })
         .option("docker", {
             alias:    "d",
@@ -244,7 +245,11 @@ const spool = new Spool()
 
             const dockerfile = path.join(tmpdir.name, "Dockerfile")
             subSpool.roll(dockerfile, (dockerfile) => fs.promises.unlink(dockerfile))
-            await fs.promises.writeFile(dockerfile, args.platform === "debian" ? rawDocker1 : rawDocker2, { encoding: "utf8" })
+            const dockerfileText =
+                args.platform === "alpine" ? rawDocker1 :
+                    args.platform === "debian" ? rawDocker2 :
+                        args.platform === "ubuntu" ? rawDocker3 : ""
+            await fs.promises.writeFile(dockerfile, dockerfileText, { encoding: "utf8" })
 
             const rcfile = path.join(tmpdir.name, "capsula-container.bash")
             subSpool.roll(rcfile, (rcfile) => fs.promises.unlink(rcfile))

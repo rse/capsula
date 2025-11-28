@@ -84,7 +84,7 @@ The particular command-line options and arguments are:
 
 - \[`-p`|`--platform` *platform*\]:
   Use a certain Linux platform for the Docker container.
-  Currently `debian` and `alpine` are supported.
+  Currently `alpine`, `debian` and `ubuntu` are supported.
 
 - \[`-d`|`--docker` *docker*\]:
   Use a certain `docker`(1) compatible command for access
