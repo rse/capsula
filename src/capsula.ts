@@ -236,15 +236,17 @@ const spool = new Spool()
         throw new Error("neither docker(1), podman(1) or nerdctl(1) command found in shell path")
     cli.log("debug", `docker command: ${chalk.blue(docker)}`)
 
-    /*  build development environment image  */
+    /*  create container image  */
     const imageId = await exec(docker, [ "images", "-q", nameImage ], { stdio: [ "ignore", "pipe", "ignore" ] })
     if ((imageId.stdout ?? "") === "") {
         cli.log("info", `creating container image ${chalk.blue(nameImage)}`)
         const subSpool = spool.sub()
         await (async () => {
+            /*  create temporary directory  */
             const tmpdir = tmp.dirSync({ mode: 0o750, prefix: "capsula-" })
             subSpool.roll(tmpdir, (tmpdir) => { tmpdir.removeCallback() })
 
+            /*  create Dockerfile  */
             const dockerfile = path.join(tmpdir.name, "Dockerfile")
             subSpool.roll(dockerfile, (dockerfile) => fs.promises.unlink(dockerfile))
             const dockerfileText =
@@ -255,11 +257,14 @@ const spool = new Spool()
                                 args.platform === "arch" ? rawDocker5 : ""
             await fs.promises.writeFile(dockerfile, dockerfileText, { encoding: "utf8" })
 
+            /*  create entrypoint script  */
             const rcfile = path.join(tmpdir.name, "capsula-container.bash")
             subSpool.roll(rcfile, (rcfile) => fs.promises.unlink(rcfile))
             await fs.promises.writeFile(rcfile, rawBash, { encoding: "utf8" })
 
+            /*  build the container image  */
             await new Promise<void>((resolve, reject) => {
+                /*  support spinner (part 1)  */
                 let spinner: ReturnType<typeof Ora> | null = null
                 let spinnerStarted = false
                 if (args.logLevel === "info") {
@@ -269,6 +274,8 @@ const spool = new Spool()
                     spinner.spinner = "dots"
                     subSpool.roll(spinner, (spinner) => { spinner.stop() })
                 }
+
+                /*  execute "docker build"  */
                 const response = exec(docker, [
                     "build",
                     "--progress", "plain",
@@ -279,6 +286,8 @@ const spool = new Spool()
                     cwd:   tmpdir.name,
                     all:   true
                 })
+
+                /*  support spinner (part 2)  */
                 response.all.on("data", (chunk: any) => {
                     const lines = chunk.toString().split(/\r?\n/)
                     if (spinner !== null) {
