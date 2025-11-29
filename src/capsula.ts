@@ -287,8 +287,9 @@ const spool = new Spool()
                     "-f", "Dockerfile",
                     "."
                 ], {
-                    cwd:   tmpdir.name,
-                    all:   true
+                    cwd:    tmpdir.name,
+                    all:    true,
+                    reject: false
                 })
 
                 /*  support spinner (part 2)  */
@@ -305,16 +306,6 @@ const spool = new Spool()
                         for (const line of lines)
                             if (line !== "")
                                 cli!.log("debug", `${docker}: | ${line}`)
-                })
-                response.all.on("end", () => {
-                    if (spinner !== null)
-                        spinner.succeed(`${docker}: SUCCEEDED`)
-                    resolve()
-                })
-                response.all.on("error", (err) => {
-                    if (spinner !== null)
-                        spinner.fail(`${docker}: FAILED: ${err}`)
-                    reject(err)
                 })
                 response.on("exit", (code) => {
                     if (code === 0) {
@@ -425,7 +416,10 @@ const spool = new Spool()
 
         /*  command to execute  */
         ...args._.map((x) => String(x))
-    ], { stdio: "inherit" })
+    ], {
+        stdio:  "inherit",
+        reject: false
+    })
     result.on("exit", async (code) => {
         /*  cleanup resources  */
         await spool.unrollAll()

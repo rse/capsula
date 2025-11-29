@@ -10,6 +10,7 @@ ChangeLog
 - IMPROVEMENT: add Arch Linux platform support
 - IMPROVEMENT: add Fedora Linux platform support
 - IMPROVEMENT: add OpenSUSE Linux platform support
+- BUGFIX: fix handling of execa() response object
 
 0.9.8 (2025-11-27)
 ------------------
