@@ -85,11 +85,13 @@ const spool = new Spool()
             "[-v|--version]",
             "[-f|--config <config>]",
             "[-l|--log-level <level>]",
-            "[-p|--platform <platform>]",
+            "[-t|--type <type>]",
             "[-d|--docker <docker>]",
             "[-c|--context <context>]",
             "[-s|--sudo]",
             "[-e|--env <variable>]",
+            "[-m|--mount <dotfile>]",
+            "[-p|--port <port>]",
             "[<command> ...]"
         ].join(" "))
         .version(false)
@@ -116,13 +118,13 @@ const spool = new Spool()
             choices:  [ "error", "warning", "info", "debug" ] as const,
             describe: "set logging level"
         })
-        .option("platform", {
-            alias:    "p",
+        .option("type", {
+            alias:    "t",
             type:     "string",
             coerce:   coerceS,
             default:  "debian",
             choices:  [ "alpine", "debian", "ubuntu", "alma", "fedora", "arch", "opensuse" ] as const,
-            describe: "set Linux platform to use for container image"
+            describe: "set Linux platform type to use for container"
         })
         .option("docker", {
             alias:    "d",
@@ -153,6 +155,20 @@ const spool = new Spool()
             default:  [],
             describe: "pass environment variable to encapsulated command"
         })
+        .option("mount", {
+            alias:    "m",
+            type:     "string",
+            coerce:   coerceA,
+            default:  [],
+            describe: "pass additional dotfile to encapsulated command"
+        })
+        .option("port", {
+            alias:    "p",
+            type:     "string",
+            coerce:   coerceA,
+            default:  [],
+            describe: "pass additional port to encapsulated command"
+        })
         .help("h", "show usage help")
         .alias("h", "help")
         .showHelpOnFail(true)
@@ -180,7 +196,7 @@ const spool = new Spool()
     /*  helper function wrapping execa()  */
     const exec = <T extends Options>(cmd: string, args: string[], opts: T) => {
         const str = [ cmd, ...args ].map((x) => x.match(/\s/) ? `'${x.replace(/'/g, "\\'")}'` : x).join(" ")
-        const options = []
+        const options: string[] = []
         if (opts.cwd)
             options.push(`cwd: ${chalk.blue(opts.cwd)}`)
         if (opts.all)
@@ -223,9 +239,9 @@ const spool = new Spool()
     /*  define the container volume, container image and container names  */
     const username      = os.userInfo().username
     const timestamp     = DateTime.now().toFormat("yyyy-MM-dd-HH-mm-ss-SSS")
-    const nameVolume    = `capsula-${username}-${args.platform}-${args.context}`
-    const nameImage     = `capsula-${username}-${args.platform}-${args.context}:${pkg.version}`
-    const nameContainer = `capsula-${username}-${args.platform}-${args.context}-${timestamp}`
+    const nameVolume    = `capsula-${username}-${args.type}-${args.context}`
+    const nameImage     = `capsula-${username}-${args.type}-${args.context}:${pkg.version}`
+    const nameContainer = `capsula-${username}-${args.type}-${args.context}-${timestamp}`
 
     /*  determine docker(1) compatible tool  */
     const haveDocker  = await existsTool("docker")
@@ -343,31 +359,6 @@ const spool = new Spool()
             .catch((err: any) => { throw new Error(`failed to create persistent volume: ${err.message ?? err}`) })
     }
 
-    /*  list of dotfiles to expose  */
-    const dotfiles = config[args.context]?.dotfiles ?? config.default?.dotfiles ?? []
-
-    /*  list of environment variables to expose  */
-    const envvars = config[args.context]?.environment ?? config.default?.environment ?? []
-
-    /*  determine "docker run" options for dotfiles  */
-    const opts = []
-    for (let dotfile of dotfiles) {
-        let ro = true
-        if (dotfile.endsWith("!")) {
-            ro = false
-            dotfile = dotfile.replace(/!$/, "")
-        }
-        const dotfilePath = path.join(home, dotfile)
-        const mountOption = ro ? ":ro" : ""
-        opts.push("-v", `${dotfilePath}:/mnt/fs-home${dotfilePath}${mountOption}`)
-    }
-
-    /*  determine "docker run" options for environment variables  */
-    for (const name of args.env)
-        envvars.push(name)
-    for (const name of envvars)
-        opts.push("-e", name)
-
     /*  determine user/group information  */
     const ui = os.userInfo()
     const uid = ui.uid.toString()
@@ -380,6 +371,59 @@ const spool = new Spool()
 
     /*  determine host information  */
     const hostname = os.hostname()
+
+    /*  start assembling "docker" options  */
+    const opts: string[] = []
+
+    /*  determine environment variables to expose  */
+    let envs: string[] =
+        config[args.context]?.env ??
+        config.default?.env ??
+        []
+    for (const env of args.env) {
+        if (env === "!")
+            envs = []
+        else
+            envs.push(env)
+    }
+    for (const env of envs)
+        opts.push("-e", env)
+
+    /*  determine dotfile mounts to expose  */
+    let mounts: string[] =
+        config[args.context]?.mount ??
+        config.default?.mount ??
+        []
+    for (const mount of args.mount) {
+        if (mount === "!")
+            mounts = []
+        else
+            mounts.push(mount)
+    }
+    for (let mount of mounts) {
+        let ro = true
+        if (mount.endsWith("!")) {
+            ro = false
+            mount = mount.replace(/!$/, "")
+        }
+        const mountPath = path.join(home, mount)
+        const mountOption = ro ? ":ro" : ""
+        opts.push("-v", `${mountPath}:/mnt/fs-home${mountPath}${mountOption}`)
+    }
+
+    /*  determine ports to expose  */
+    let ports: string[] =
+        config[args.context]?.port ??
+        config.default?.port ??
+        []
+    for (const port of args.port) {
+        if (port === "!")
+            ports = []
+        else
+            ports.push(port)
+    }
+    for (const port of ports)
+        opts.push("-p", `${port}:${port}`)
 
     /*  create local copies of entrypoint script  */
     const subSpool = spool.sub()
@@ -406,14 +450,14 @@ const spool = new Spool()
 
         /*  entrypoint arguments  */
         nameImage,
-        args.platform,
+        args.type,
         hostname,
         usr, uid,
         grp, gid,
         home,
         workdir,
-        dotfiles.join(" "),
-        envvars.join(" "),
+        mounts.join(" "),
+        envs.join(" "),
         args.sudo ? "yes" : "no",
 
         /*  command to execute  */

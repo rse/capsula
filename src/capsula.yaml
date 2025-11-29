@@ -3,10 +3,10 @@
 ##
 
 default:
-    environment:
+    env:
         - TERM
         - HOME
-    dotfiles:
+    mount:
         - .bash_login
         - .bash_logout
         - .bashrc
@@ -19,4 +19,6 @@ default:
         - .gitconfig
         - .npmrc
         - .cache!
+    port:
+        - 8888
 

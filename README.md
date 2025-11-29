@@ -60,11 +60,13 @@ $ `capsula`
 \[`-v`|`--version`\]
 \[`-f`|`--config` *config*\]
 \[`-l`|`--log-level` *level*\]
-\[`-p`|`--platform` *platform*\]
+\[`-t`|`--type` *type*\]
 \[`-d`|`--docker` *docker*\]
 \[`-c`|`--context` *context*\]
 \[`-s`|`--sudo`\]
 \[`-e`|`--env` *variable*\]
+\[`-m`|`--mount` *dotfile*\]
+\[`-p`|`--port` *port*\]
 \[*command* ...\]
 
 The particular command-line options and arguments are:
@@ -82,7 +84,7 @@ The particular command-line options and arguments are:
 - \[`-l`|`--log-level` *level*\]:
   Set the logging level: `error`, `warning`, `info` or `debug`.
 
-- \[`-p`|`--platform` *platform*\]:
+- \[`-t`|`--type` *type*\]:
   Use a certain Linux platform for the Docker container.
   Currently `alpine`, `debian`, `ubuntu`, `alma`, `fedora`, `arch`,
   and `opensuse` are supported.
@@ -102,6 +104,12 @@ The particular command-line options and arguments are:
 - \[`-e`|`--env` *variable*\]:
   Pass environment variable to encapsulated command.
 
+- \[`-m`|`--mount` *mount*\]:
+  Pass dotfile to encapsulated command.
+
+- \[`-p`|`--port` *port*\]:
+  Map port for encapsulated command.
+
 - \[*command* ...\]:
   Execute the particular command inside the Linux Docker container.
   If missing, `bash`(1) is called.
@@ -113,10 +121,10 @@ The following is the default context configuration:
 
 ```yaml
 default:
-    environment:
+    env:
         - TERM
         - HOME
-    dotfiles:
+    mount:
         - .bash_login
         - .bash_logout
         - .bashrc
@@ -129,9 +137,14 @@ default:
         - .gitconfig
         - .npmrc
         - .cache!
+    port:
+        - 8888
 ```
 
 An overriding custom configuration file can be given with option `-f`/`--config`.
+Option `-e`/`--env` can be used to override the section `env`.
+Option `-m`/`--mount` can be used to override the section `mount`.
+Option `-p`/`--port` can be used to override the section `port`.
 
 Example
 -------
