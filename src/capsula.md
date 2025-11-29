@@ -65,12 +65,21 @@ The following command-line options and arguments exist to the `capsula(1)` comma
 
 - \[`-e`|`--env` *variable*\]:
   Pass environment variable to encapsulated command.
+  This option can be given multiple times.
+  Passing `!` as *variable* resets the environment variables
+  from the *context* given by the specified *config* or the default.
 
 - \[`-m`|`--mount` *mount*\]:
   Pass dotfile to encapsulated command.
+  This option can be given multiple times.
+  Passing `!` as *mount* resets the dotfiles
+  from the *context* given by the specified *config* or the default.
 
 - \[`-p`|`--port` *port*\]:
   Map port for encapsulated command.
+  This option can be given multiple times.
+  Passing `!` as *port* resets the ports
+  from the *context* given by the specified *config* or the default.
 
 - \[*command* ...\]:
   Execute the particular command inside the Linux Docker container.
