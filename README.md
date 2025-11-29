@@ -69,6 +69,9 @@ $ `capsula`
 \[`-e`|`--env` *variable*\]
 \[`-m`|`--mount` *dotfile*\]
 \[`-p`|`--port` *port*\]
+\[`-I`|`--image` *image-name*\]
+\[`-C`|`--container` *container-name*\]
+\[`-V`|`--volume` *volume-name*\]
 \[*command* ...\]
 
 The particular command-line options and arguments are:
@@ -120,6 +123,35 @@ The particular command-line options and arguments are:
   This option can be given multiple times.
   Passing `!` as *port* resets the ports
   from the *context* given by the specified *config* or the default.
+
+- \[`-I`|`--image` *image-name*\]:
+  Set the name of the container image.
+  When specified, the container runtime has to be able to fetch it.
+  When not specified, it is auto-rebuilt based on the *type* (options `-t`/`--type`).
+  The default is the unique name `capsula-`*username*`-`*type*`-`*context*`:`*version*,
+  where *username* is the username of the current user,
+  *type* corresponds to option `-t`/`--type`,
+  *context* corresponds to option `-c`/`--context`,
+  and *version* is the current **Capsula** version.
+
+- \[`-C`|`--container` *container-name*\]:
+  Set the name of the container.
+  When specified, it has to be unique across the container runtime.
+  It is created on all executions of **Capsula**.
+  The default is the unique name `capsula-`*username*`-`*type*`-`*context*`-`*timestamp*,
+  where *username* is the username of the current user,
+  *type* corresponds to option `-t`/`--type`,
+  *context* corresponds to option `-c`/`--context`,
+  and *timestamp* is the current timestamp in `yyyy-MM-dd-HH-mm-ss-SSS` format.
+
+- \[`-V`|`--volume` *volume-name*\]:
+  Set the name of the container volume.
+  When specified, it has to be unique across the container runtime.
+  It is initially auto-created and then reused across all executions of **Capsula**.
+  The default is the unique name `capsula-`*username*`-`*type*`-`*context*,
+  where *username* is the username of the current user,
+  *type* corresponds to option `-t`/`--type`,
+  *context* corresponds to option `-c`/`--context`.
 
 - \[*command* ...\]:
   Execute the particular command inside the Linux Docker container.

@@ -92,6 +92,9 @@ const spool = new Spool()
             "[-e|--env <variable>]",
             "[-m|--mount <dotfile>]",
             "[-p|--port <port>]",
+            "[-I|--image <image-name>]",
+            "[-C|--container <container-name>]",
+            "[-V|--volume <volume-name>]",
             "[<command> ...]"
         ].join(" "))
         .version(false)
@@ -169,6 +172,27 @@ const spool = new Spool()
             default:  [],
             describe: "pass additional port to encapsulated command"
         })
+        .option("image", {
+            alias:    "I",
+            type:     "string",
+            coerce:   coerceS<string>,
+            default:  "",
+            describe: "set name of Docker container image"
+        })
+        .option("container", {
+            alias:    "C",
+            type:     "string",
+            coerce:   coerceS<string>,
+            default:  "",
+            describe: "set name of Docker container"
+        })
+        .option("volume", {
+            alias:    "V",
+            type:     "string",
+            coerce:   coerceS<string>,
+            default:  "",
+            describe: "set name of Docker volume"
+        })
         .help("h", "show usage help")
         .alias("h", "help")
         .showHelpOnFail(true)
@@ -237,11 +261,14 @@ const spool = new Spool()
     }
 
     /*  define the container volume, container image and container names  */
-    const username      = os.userInfo().username
-    const timestamp     = DateTime.now().toFormat("yyyy-MM-dd-HH-mm-ss-SSS")
-    const nameVolume    = `capsula-${username}-${args.type}-${args.context}`
-    const nameImage     = `capsula-${username}-${args.type}-${args.context}:${pkg.version}`
-    const nameContainer = `capsula-${username}-${args.type}-${args.context}-${timestamp}`
+    const username  = os.userInfo().username
+    const timestamp = DateTime.now().toFormat("yyyy-MM-dd-HH-mm-ss-SSS")
+    const nameImage = args.image !== "" ? args.image :
+        `capsula-${username}-${args.type}-${args.context}:${pkg.version}`
+    const nameContainer = args.container !== "" ? args.container :
+        `capsula-${username}-${args.type}-${args.context}-${timestamp}`
+    const nameVolume = args.volume !== "" ? args.volume :
+        `capsula-${username}-${args.type}-${args.context}`
 
     /*  determine docker(1) compatible tool  */
     const haveDocker  = await existsTool("docker")

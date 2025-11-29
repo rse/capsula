@@ -12,6 +12,7 @@ ChangeLog
 - IMPROVEMENT: add OpenSUSE Linux platform support
 - IMPROVEMENT: allow dotfiles to be added on command-line
 - IMPROVEMENT: allow ports to be mapped
+- IMPROVEMENT: allow image, container and volume name be overridden
 - BUGFIX: fix handling of execa() response object
 
 0.9.8 (2025-11-27)
