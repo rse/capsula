@@ -32,12 +32,12 @@ RUN         ln -sf /usr/bin/vim /usr/bin/vi
 
 #   reconfigure system for EN/DE and ISO-Latin1/UTF8
 RUN         apk add musl-locales musl-locales-lang && \
-            ( echo "en_US ISO-8859-1"; \
-              echo "en_US.ISO-8859-15 ISO-8859-15"; \
-              echo "en_US.UTF-8 UTF-8"; \
-              echo "de_DE ISO-8859-1"; \
-              echo "de_DE.UTF-8 UTF-8"; \
-              echo "de_DE@euro ISO-8859-15"; \
+            (   echo "en_US ISO-8859-1"; \
+                echo "en_US.ISO-8859-15 ISO-8859-15"; \
+                echo "en_US.UTF-8 UTF-8"; \
+                echo "de_DE ISO-8859-1"; \
+                echo "de_DE.UTF-8 UTF-8"; \
+                echo "de_DE@euro ISO-8859-15"; \
             ) >/etc/locale.gen; \
             locale -a
 

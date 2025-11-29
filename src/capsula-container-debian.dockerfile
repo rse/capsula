@@ -30,12 +30,12 @@ RUN         apt-get install -y --no-install-recommends \
 
 #   reconfigure system for EN/DE and ISO-Latin1/UTF8
 RUN         apt-get install -y --no-install-recommends locales && \
-            ( echo "en_US ISO-8859-1"; \
-              echo "en_US.ISO-8859-15 ISO-8859-15"; \
-              echo "en_US.UTF-8 UTF-8"; \
-              echo "de_DE ISO-8859-1"; \
-              echo "de_DE.UTF-8 UTF-8"; \
-              echo "de_DE@euro ISO-8859-15"; \
+            (   echo "en_US ISO-8859-1"; \
+                echo "en_US.ISO-8859-15 ISO-8859-15"; \
+                echo "en_US.UTF-8 UTF-8"; \
+                echo "de_DE ISO-8859-1"; \
+                echo "de_DE.UTF-8 UTF-8"; \
+                echo "de_DE@euro ISO-8859-15"; \
             ) >/etc/locale.gen; \
             locale-gen
 
