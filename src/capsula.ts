@@ -25,13 +25,13 @@ import { DateTime }            from "luxon"
 
 /*  internal dependencies  */
 import pkg                     from "../package.json"                             with { type: "json"   }
-import rawDocker1              from "./capsula-container-alpine.dockerfile?raw"   with { type: "string" }
-import rawDocker2              from "./capsula-container-debian.dockerfile?raw"   with { type: "string" }
-import rawDocker3              from "./capsula-container-ubuntu.dockerfile?raw"   with { type: "string" }
-import rawDocker4              from "./capsula-container-alma.dockerfile?raw"     with { type: "string" }
-import rawDocker5              from "./capsula-container-fedora.dockerfile?raw"   with { type: "string" }
-import rawDocker6              from "./capsula-container-arch.dockerfile?raw"     with { type: "string" }
-import rawDocker7              from "./capsula-container-opensuse.dockerfile?raw" with { type: "string" }
+import rawDockerAlpine         from "./capsula-container-alpine.dockerfile?raw"   with { type: "string" }
+import rawDockerDebian         from "./capsula-container-debian.dockerfile?raw"   with { type: "string" }
+import rawDockerUbuntu         from "./capsula-container-ubuntu.dockerfile?raw"   with { type: "string" }
+import rawDockerAlma           from "./capsula-container-alma.dockerfile?raw"     with { type: "string" }
+import rawDockerFedora         from "./capsula-container-fedora.dockerfile?raw"   with { type: "string" }
+import rawDockerArch           from "./capsula-container-arch.dockerfile?raw"     with { type: "string" }
+import rawDockerOpenSUSE       from "./capsula-container-opensuse.dockerfile?raw" with { type: "string" }
 import rawBash                 from "./capsula-container.bash?raw"                with { type: "string" }
 import rawDefaults             from "./capsula.yaml?raw"                          with { type: "string" }
 
@@ -254,13 +254,13 @@ const spool = new Spool()
             const dockerfile = path.join(tmpdir.name, "Dockerfile")
             subSpool.roll(dockerfile, (dockerfile) => fs.promises.unlink(dockerfile))
             const dockerfileText =
-                args.platform === "alpine" ? rawDocker1 :
-                    args.platform === "debian" ? rawDocker2 :
-                        args.platform === "ubuntu" ? rawDocker3 :
-                            args.platform === "alma" ? rawDocker4 :
-                                args.platform === "fedora" ? rawDocker5 :
-                                    args.platform === "arch" ? rawDocker6 :
-                                        args.platform === "opensuse" ? rawDocker7 : ""
+                args.type === "alpine" ? rawDockerAlpine :
+                    args.type === "debian" ? rawDockerDebian :
+                        args.type === "ubuntu" ? rawDockerUbuntu :
+                            args.type === "alma" ? rawDockerAlma :
+                                args.type === "fedora" ? rawDockerFedora :
+                                    args.type === "arch" ? rawDockerArch :
+                                        args.type === "opensuse" ? rawDockerOpenSUSE : ""
             await fs.promises.writeFile(dockerfile, dockerfileText, { encoding: "utf8" })
 
             /*  create entrypoint script  */
