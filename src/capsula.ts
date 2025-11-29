@@ -98,14 +98,14 @@ const spool = new Spool()
         .option("version", {
             alias:    "v",
             type:     "boolean",
-            coerce:   coerceS,
+            coerce:   coerceS<boolean>,
             default:  false,
             describe: "show program version"
         })
         .option("config", {
             alias:    "f",
             type:     "string",
-            coerce:   coerceS,
+            coerce:   coerceS<string>,
             default:  path.join(os.homedir(), ".capsula.yaml"),
             describe: "set context configuration file"
         })
@@ -113,7 +113,7 @@ const spool = new Spool()
             alias:    "l",
             type:     "string",
             nargs:    1,
-            coerce:   coerceS,
+            coerce:   coerceS<string>,
             default:  "info",
             choices:  [ "error", "warning", "info", "debug" ] as const,
             describe: "set logging level"
@@ -121,7 +121,7 @@ const spool = new Spool()
         .option("type", {
             alias:    "t",
             type:     "string",
-            coerce:   coerceS,
+            coerce:   coerceS<string>,
             default:  "debian",
             choices:  [ "alpine", "debian", "ubuntu", "alma", "fedora", "arch", "opensuse" ] as const,
             describe: "set Linux platform type to use for container"
@@ -129,7 +129,7 @@ const spool = new Spool()
         .option("docker", {
             alias:    "d",
             type:     "string",
-            coerce:   coerceS,
+            coerce:   coerceS<string>,
             default:  "",
             describe: "set docker(1) compatible tool"
         })
@@ -137,35 +137,35 @@ const spool = new Spool()
             alias:    "c",
             type:     "string",
             nargs:    1,
-            coerce:   coerceS,
+            coerce:   coerceS<string>,
             default:  "default",
             describe: "unique context name"
         })
         .option("sudo", {
             alias:    "s",
             type:     "boolean",
-            coerce:   coerceS,
+            coerce:   coerceS<boolean>,
             default:  false,
             describe: "enable sudo(8) for user in container"
         })
         .option("env", {
             alias:    "e",
             type:     "string",
-            coerce:   coerceA,
+            coerce:   coerceA<string>,
             default:  [],
             describe: "pass environment variable to encapsulated command"
         })
         .option("mount", {
             alias:    "m",
             type:     "string",
-            coerce:   coerceA,
+            coerce:   coerceA<string>,
             default:  [],
             describe: "pass additional dotfile to encapsulated command"
         })
         .option("port", {
             alias:    "p",
             type:     "string",
-            coerce:   coerceA,
+            coerce:   coerceA<string>,
             default:  [],
             describe: "pass additional port to encapsulated command"
         })
