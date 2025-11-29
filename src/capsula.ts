@@ -76,8 +76,8 @@ const spool = new Spool()
     tmp.setGracefulCleanup()
 
     /*  parse command-line arguments  */
-    const coerceS = (arg: any) => Array.isArray(arg) ? arg[arg.length - 1] : arg
-    const coerceA = (arg: any) => Array.isArray(arg) ? arg : [ arg ]
+    const coerceS = <T>(arg: T | T[]): T => Array.isArray(arg) ? arg[arg.length - 1] : arg
+    const coerceA = <T>(arg: T | T[]): T[] => Array.isArray(arg) ? arg : [ arg ]
     const args = await yargs()
         .usage([
             "Usage: capsula",
