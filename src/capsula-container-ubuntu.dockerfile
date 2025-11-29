@@ -55,7 +55,7 @@ RUN         chmod 777 /mnt/fs-volume
 RUN         apt-get purge -y --auto-remove && \
             apt-get clean && \
             rm -rf /var/lib/apt/lists/*
-RUN         /tmp/* /var/tmp/*
+RUN         rm -rf /tmp/* /var/tmp/*
 
 #   provide default entry point
 ENTRYPOINT  []

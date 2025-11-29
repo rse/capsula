@@ -51,7 +51,7 @@ RUN         chmod 777 /mnt/fs-volume
 RUN         dnf autoremove -y && \
             dnf clean all && \
             rm -rf /var/cache/dnf/*
-RUN         /tmp/* /var/tmp/*
+RUN         rm -rf /tmp/* /var/tmp/*
 
 #   provide default entry point
 ENTRYPOINT  []

@@ -43,7 +43,7 @@ RUN         chmod 777 /mnt/fs-volume
 RUN         pacman -Rns --noconfirm $(pacman -Qtdq) 2>/dev/null || true && \
             pacman -Scc --noconfirm && \
             rm -rf /var/cache/pacman/pkg/*
-RUN         /tmp/* /var/tmp/*
+RUN         rm -rf /tmp/* /var/tmp/*
 
 #   provide default entry point
 ENTRYPOINT  []
