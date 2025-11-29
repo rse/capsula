@@ -2,7 +2,7 @@
 ChangeLog
 =========
 
-0.9.9 (2025-11-29)
+1.0.0 (2025-11-29)
 ------------------
 
 - IMPROVEMENT: add Ubuntu Linux platform support
