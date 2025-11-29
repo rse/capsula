@@ -42,7 +42,7 @@ RUN         dnf install -y glibc-langpack-en glibc-langpack-de glibc-locale-sour
 #   make sure TLS uses up-to-date CA certificates
 RUN         update-ca-trust
 
-#   force new NPM prefix
+#   create volume
 RUN         mkdir -p /mnt/fs-volume
 VOLUME      /mnt/fs-volume
 RUN         chmod 777 /mnt/fs-volume
@@ -50,7 +50,8 @@ RUN         chmod 777 /mnt/fs-volume
 #   cleanup
 RUN         dnf autoremove -y && \
             dnf clean all && \
-            rm -rf /var/cache/dnf/* /tmp/* /var/tmp/*
+            rm -rf /var/cache/dnf/*
+RUN         /tmp/* /var/tmp/*
 
 #   provide default entry point
 ENTRYPOINT  []

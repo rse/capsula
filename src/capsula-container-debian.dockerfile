@@ -42,7 +42,7 @@ RUN         apt-get install -y --no-install-recommends locales && \
 #   make sure TLS uses up-to-date CA certificates
 RUN         update-ca-certificates
 
-#   force new NPM prefix
+#   create volume
 RUN         mkdir -p /mnt/fs-volume
 VOLUME      /mnt/fs-volume
 RUN         chmod 777 /mnt/fs-volume
@@ -50,7 +50,8 @@ RUN         chmod 777 /mnt/fs-volume
 #   cleanup
 RUN         apt-get purge -y --auto-remove && \
             apt-get clean && \
-            rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+            rm -rf /var/lib/apt/lists/*
+RUN         /tmp/* /var/tmp/*
 
 #   provide default entry point
 ENTRYPOINT  []

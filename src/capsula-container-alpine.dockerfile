@@ -44,14 +44,15 @@ RUN         apk add musl-locales musl-locales-lang && \
 #   make sure TLS uses up-to-date CA certificates
 RUN         update-ca-certificates
 
-#   force new NPM prefix
+#   create volume
 RUN         mkdir -p /mnt/fs-volume
 VOLUME      /mnt/fs-volume
 RUN         chmod 777 /mnt/fs-volume
 
 #   cleanup
 RUN         apk cache clean && \
-            rm -rf /var/cache/apk/* /tmp/* /var/tmp/*
+            rm -rf /var/cache/apk/*
+RUN         /tmp/* /var/tmp/*
 
 #   provide default entry point
 ENTRYPOINT  []

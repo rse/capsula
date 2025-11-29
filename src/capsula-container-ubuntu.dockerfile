@@ -46,7 +46,7 @@ RUN         update-ca-certificates
 #   get rid of nasty "sudo" hints
 RUN         sed -i -e "/^# sudo hint/,/^fi/d" /etc/bash.bashrc
 
-#   force new NPM prefix
+#   create volume
 RUN         mkdir -p /mnt/fs-volume
 VOLUME      /mnt/fs-volume
 RUN         chmod 777 /mnt/fs-volume
@@ -54,7 +54,8 @@ RUN         chmod 777 /mnt/fs-volume
 #   cleanup
 RUN         apt-get purge -y --auto-remove && \
             apt-get clean && \
-            rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+            rm -rf /var/lib/apt/lists/*
+RUN         /tmp/* /var/tmp/*
 
 #   provide default entry point
 ENTRYPOINT  []

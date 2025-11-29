@@ -302,18 +302,31 @@ const spool = new Spool()
                             if (line !== "")
                                 cli!.log("debug", `${docker}: | ${line}`)
                 })
-                response.all.on("error", (err) => {
-                    if (spinner !== null)
-                        spinner.fail(`${docker}: FAILED: ${err}`)
-                    reject(err)
-                })
                 response.all.on("end", () => {
                     if (spinner !== null)
                         spinner.succeed(`${docker}: SUCCEEDED`)
                     resolve()
                 })
+                response.all.on("error", (err) => {
+                    if (spinner !== null)
+                        spinner.fail(`${docker}: FAILED: ${err}`)
+                    reject(err)
+                })
+                response.on("exit", (code) => {
+                    if (spinner !== null)
+                        spinner.fail(`${docker}: FAILED`)
+                    if (code === 0)
+                        resolve()
+                    else
+                        reject(new Error(`failed with exit code ${code}`))
+                })
+                response.on("error", (err) => {
+                    if (spinner !== null)
+                        spinner.fail(`${docker}: FAILED: ${err}`)
+                    reject(err)
+                })
             })
-        })().catch(async (err: any) => {
+        })().catch((err: any) => {
             throw new Error(`failed to build container: ${err?.message ?? err}`)
         }).finally(async () => {
             await spool.unroll()
