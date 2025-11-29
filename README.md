@@ -15,14 +15,16 @@ Capsula
 Abstract
 --------
 
-**Capsula** is a utility program for executing a *Linux* command in the
-current working directory from within an encapsulated environment
-based on a [*Docker*](https://www.docker.com/) or [*Podman*](https://podman.io/) container.
-The crux is that the **Capsula** container
-environment provides a special filesystem layout to the command, which
-mimics the host filesystem paths as close as possible, but prevents
-access to non-relevant areas of the user's home directory and persists
-changes to the areas outside the user's home directory.
+**Capsula** is a utility program for executing a *Linux* command
+in the current working directory from within an encapsulated
+environment based on a [*Docker*](https://www.docker.com/) or
+[*Podman*](https://podman.io/) container.
+
+The crux is that the **Capsula** container environment provides a
+special filesystem layout to the command, which mimics the host
+filesystem paths as close as possible, but prevents access to
+non-relevant areas of the user's home directory and persists changes to
+the operating system.
 
 Prerequisites
 -------------
