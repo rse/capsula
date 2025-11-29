@@ -114,6 +114,7 @@ The particular command-line options and arguments are:
 
 - \[`-m`|`--mount` *mount*\]:
   Pass dotfile to encapsulated command.
+  The *mount* argument has to be a pathname relative to the current user's home directory.
   This option can be given multiple times.
   Passing `!` as *mount* resets the dotfiles
   from the *context* given by the specified *config* or the default.
@@ -133,6 +134,9 @@ The particular command-line options and arguments are:
   *type* corresponds to option `-t`/`--type`,
   *context* corresponds to option `-c`/`--context`,
   and *version* is the current **Capsula** version.
+  Custom images need to have at least `bash`(1) under the system path `/bin/bash`,
+  and the companion commands `hostname`(8), `mount`(8), `umount`(8),
+  `pivot_root`(8) and `sudo`(8) in `$PATH`.
 
 - \[`-C`|`--container` *container-name*\]:
   Set the name of the container.
