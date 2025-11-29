@@ -15,7 +15,7 @@ WORKDIR     /
 #   prepare
 RUN         apk update
 
-#   update Alpine to latest patch-level
+#   update system to latest patch-level
 RUN         apk upgrade
 
 #   install additional tools
@@ -30,7 +30,7 @@ RUN         apk add \
                 mandoc man-pages man-pages-posix
 RUN         ln -sf /usr/bin/vim /usr/bin/vi
 
-#   reconfigure Alpine for EN/DE and ISO-Latin1/UTF8
+#   reconfigure system for EN/DE and ISO-Latin1/UTF8
 RUN         apk add musl-locales musl-locales-lang && \
             ( echo "en_US ISO-8859-1"; \
               echo "en_US.ISO-8859-15 ISO-8859-15"; \

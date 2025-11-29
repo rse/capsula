@@ -15,7 +15,7 @@ WORKDIR     /
 #   prepare
 RUN         apt-get update
 
-#   update Debian to latest patch-level
+#   update system to latest patch-level
 RUN         apt-get upgrade -y
 
 #   install additional tools
@@ -28,7 +28,7 @@ RUN         apt-get install -y --no-install-recommends \
                 procps net-tools htop lsof strace \
                 man manpages
 
-#   reconfigure Debian for EN/DE and ISO-Latin1/UTF8
+#   reconfigure system for EN/DE and ISO-Latin1/UTF8
 RUN         apt-get install -y --no-install-recommends locales && \
             ( echo "en_US ISO-8859-1"; \
               echo "en_US.ISO-8859-15 ISO-8859-15"; \

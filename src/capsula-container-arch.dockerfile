@@ -12,7 +12,7 @@ FROM        archlinux/archlinux:base
 #   switch working directory
 WORKDIR     /
 
-#   prepare and update Arch to latest
+#   prepare and update system to latest
 RUN         pacman -Syu --noconfirm
 
 #   install additional tools
@@ -24,7 +24,7 @@ RUN         pacman -Sy --noconfirm \
                 procps-ng net-tools inetutils htop lsof strace \
                 man-db man-pages
 
-#   reconfigure Arch for EN/DE and UTF8
+#   reconfigure system for EN/DE and UTF8
 RUN         pacman -Sy --noconfirm glibc glibc-locales
 RUN         sed -i -e 's;^#\(en_US\.UTF-8 UTF-8\);\1;' \
                 -e 's;^#\(en_US ISO-8859-1\);\1;' \
