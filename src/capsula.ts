@@ -24,16 +24,16 @@ import Ora                     from "ora"
 import { DateTime }            from "luxon"
 
 /*  internal dependencies  */
-import pkg                     from "../package.json"                           with { type: "json"   }
-import rawDocker1              from "./capsula-container-alpine.dockerfile?raw" with { type: "string" }
-import rawDocker2              from "./capsula-container-debian.dockerfile?raw" with { type: "string" }
-import rawDocker3              from "./capsula-container-ubuntu.dockerfile?raw" with { type: "string" }
-import rawDocker4              from "./capsula-container-alma.dockerfile?raw"   with { type: "string" }
-import rawDocker5              from "./capsula-container-fedora.dockerfile?raw" with { type: "string" }
+import pkg                     from "../package.json"                             with { type: "json"   }
+import rawDocker1              from "./capsula-container-alpine.dockerfile?raw"   with { type: "string" }
+import rawDocker2              from "./capsula-container-debian.dockerfile?raw"   with { type: "string" }
+import rawDocker3              from "./capsula-container-ubuntu.dockerfile?raw"   with { type: "string" }
+import rawDocker4              from "./capsula-container-alma.dockerfile?raw"     with { type: "string" }
+import rawDocker5              from "./capsula-container-fedora.dockerfile?raw"   with { type: "string" }
 import rawDocker6              from "./capsula-container-arch.dockerfile?raw"     with { type: "string" }
 import rawDocker7              from "./capsula-container-opensuse.dockerfile?raw" with { type: "string" }
 import rawBash                 from "./capsula-container.bash?raw"                with { type: "string" }
-import rawDefaults             from "./capsula.yaml?raw"                        with { type: "string" }
+import rawDefaults             from "./capsula.yaml?raw"                          with { type: "string" }
 
 /*  helper class for resource spooling  */
 interface SpoolResource<T = unknown> {
@@ -317,12 +317,16 @@ const spool = new Spool()
                     reject(err)
                 })
                 response.on("exit", (code) => {
-                    if (spinner !== null)
-                        spinner.fail(`${docker}: FAILED`)
-                    if (code === 0)
+                    if (code === 0) {
+                        if (spinner !== null)
+                            spinner.succeed(`${docker}: SUCCEEDED`)
                         resolve()
-                    else
+                    }
+                    else {
+                        if (spinner !== null)
+                            spinner.fail(`${docker}: FAILED`)
                         reject(new Error(`failed with exit code ${code}`))
+                    }
                 })
                 response.on("error", (err) => {
                     if (spinner !== null)
