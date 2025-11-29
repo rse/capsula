@@ -5,7 +5,7 @@
     "homepage":                         "http://github.com/rse/capsula",
     "repository":                       { "url": "git+https://github.com/rse/capsula.git", "type": "git" },
     "bugs":                             { "url": "http://github.com/rse/capsula/issues" },
-    "version":                          "0.9.8",
+    "version":                          "1.0.0",
     "license":                          "MIT",
     "bin":                              { "capsula": "dst-stage2/capsula.js" },
     "author": {
