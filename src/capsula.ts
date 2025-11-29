@@ -79,17 +79,19 @@ const spool = new Spool()
     const coerceS = (arg: any) => Array.isArray(arg) ? arg[arg.length - 1] : arg
     const coerceA = (arg: any) => Array.isArray(arg) ? arg : [ arg ]
     const args = await yargs()
-        .usage("Usage: capsula " +
-            "[-h|--help] " +
-            "[-v|--version] " +
-            "[-f|--config <config>] " +
-            "[-l|--log-level <level>] " +
-            "[-p|--platform <platform>] " +
-            "[-d|--docker <docker>] " +
-            "[-c|--context <context>] " +
-            "[-s|--sudo] " +
+        .usage([
+            "Usage: capsula",
+            "[-h|--help]",
+            "[-v|--version]",
+            "[-f|--config <config>]",
+            "[-l|--log-level <level>]",
+            "[-p|--platform <platform>]",
+            "[-d|--docker <docker>]",
+            "[-c|--context <context>]",
+            "[-s|--sudo]",
+            "[-e|--env <variable>]",
             "[<command> ...]"
-        )
+        ].join(" "))
         .version(false)
         .option("version", {
             alias:    "v",
