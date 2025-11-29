@@ -3,8 +3,6 @@
 ##  Copyright (c) 2025 Dr. Ralf S. Engelschall <rse@engelschall.com>
 ##  Licensed under MIT <https://spdx.org/licenses/MIT>
 ##
-##  capsula-container-ubuntu.dockerfile: Docker Container Specification (Ubuntu)
-##
 
 #   derive image from a certain base image
 FROM        ubuntu:24.04

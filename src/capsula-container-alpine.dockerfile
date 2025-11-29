@@ -3,8 +3,6 @@
 ##  Copyright (c) 2025 Dr. Ralf S. Engelschall <rse@engelschall.com>
 ##  Licensed under MIT <https://spdx.org/licenses/MIT>
 ##
-##  capsula-container-alpine.dockerfile: Docker Container Specification (Alpine)
-##
 
 #   derive image from a certain base image
 FROM        alpine:3.22
