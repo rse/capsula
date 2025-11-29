@@ -9,6 +9,7 @@ ChangeLog
 - IMPROVEMENT: add Alma Linux platform support
 - IMPROVEMENT: add Arch Linux platform support
 - IMPROVEMENT: add Fedora Linux platform support
+- IMPROVEMENT: add OpenSUSE Linux platform support
 
 0.9.8 (2025-11-27)
 ------------------

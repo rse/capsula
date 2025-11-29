@@ -30,8 +30,9 @@ import rawDocker2              from "./capsula-container-debian.dockerfile?raw" 
 import rawDocker3              from "./capsula-container-ubuntu.dockerfile?raw" with { type: "string" }
 import rawDocker4              from "./capsula-container-alma.dockerfile?raw"   with { type: "string" }
 import rawDocker5              from "./capsula-container-fedora.dockerfile?raw" with { type: "string" }
-import rawDocker6              from "./capsula-container-arch.dockerfile?raw"   with { type: "string" }
-import rawBash                 from "./capsula-container.bash?raw"              with { type: "string" }
+import rawDocker6              from "./capsula-container-arch.dockerfile?raw"     with { type: "string" }
+import rawDocker7              from "./capsula-container-opensuse.dockerfile?raw" with { type: "string" }
+import rawBash                 from "./capsula-container.bash?raw"                with { type: "string" }
 import rawDefaults             from "./capsula.yaml?raw"                        with { type: "string" }
 
 /*  helper class for resource spooling  */
@@ -118,7 +119,7 @@ const spool = new Spool()
             type:     "string",
             coerce:   coerceS,
             default:  "debian",
-            choices:  [ "alpine", "debian", "ubuntu", "alma", "fedora", "arch" ] as const,
+            choices:  [ "alpine", "debian", "ubuntu", "alma", "fedora", "arch", "opensuse" ] as const,
             describe: "set Linux platform to use for container image"
         })
         .option("docker", {
@@ -256,7 +257,8 @@ const spool = new Spool()
                         args.platform === "ubuntu" ? rawDocker3 :
                             args.platform === "alma" ? rawDocker4 :
                                 args.platform === "fedora" ? rawDocker5 :
-                                    args.platform === "arch" ? rawDocker6 : ""
+                                    args.platform === "arch" ? rawDocker6 :
+                                        args.platform === "opensuse" ? rawDocker7 : ""
             await fs.promises.writeFile(dockerfile, dockerfileText, { encoding: "utf8" })
 
             /*  create entrypoint script  */
