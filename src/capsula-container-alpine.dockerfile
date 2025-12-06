@@ -5,7 +5,7 @@
 ##
 
 #   derive image from a certain base image
-FROM        alpine:3.22
+FROM        alpine:3.23
 
 #   switch working directory
 WORKDIR     /
