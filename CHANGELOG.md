@@ -2,6 +2,11 @@
 ChangeLog
 =========
 
+1.0.2 (2025-12-06)
+------------------
+
+- UPGRADE: updated Alpine container image to Alpine Linux 3.23
+
 1.0.1 (2025-12-06)
 ------------------
 
