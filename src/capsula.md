@@ -73,11 +73,11 @@ The following command-line options and arguments exist to the `capsula(1)` comma
   from the *context* given by the specified *config* or the default.
 
 - \[`-m`|`--mount` *mount*\]:
-  Pass dotfile to encapsulated command.
-  The *mount* argument has to be a pathname relative to the current user's home directory.
-  This option can be given multiple times.
-  Passing `!` as *mount* resets the dotfiles
-  from the *context* given by the specified *config* or the default.
+  Pass dotfile to encapsulated command. The *mount* argument has to
+  be a pathname relative to the current user's home directory. This
+  option can be given multiple times. Passing `!` as *mount* resets the
+  dotfiles from the *context* given by the specified *config* or the
+  default.
 
 - \[`-p`|`--port` *port*\]:
   Map port for encapsulated command.
