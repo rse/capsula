@@ -2,10 +2,11 @@
 ChangeLog
 =========
 
-1.0.2 (2025-12-06)
+1.0.2 (2025-12-15)
 ------------------
 
 - UPGRADE: updated Alpine container image to Alpine Linux 3.23
+- UPGRADE: upgrade NPM dependencies
 
 1.0.1 (2025-12-06)
 ------------------
