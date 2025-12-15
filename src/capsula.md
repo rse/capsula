@@ -12,7 +12,7 @@
 \[`-d`|`--docker` *docker*\]
 \[`-c`|`--context` *context*\]
 \[`-s`|`--sudo`\]
-\[`-e`|`--env` *variable*\]
+\[`-e`|`--env` *variable*\[`=`*value*\]\]
 \[`-m`|`--mount` *dotfile*\]
 \[`-p`|`--port` *port*\]
 \[`-I`|`--image` *image-name*\]
@@ -66,11 +66,13 @@ The following command-line options and arguments exist to the `capsula(1)` comma
 - \[`-s`|`--sudo`\]:
   Enable sudo(8) for user in container.
 
-- \[`-e`|`--env` *variable*\]:
+- \[`-e`|`--env` *variable*\[`=`*value*\]\]:
   Pass environment variable to encapsulated command.
   This option can be given multiple times.
   Passing `!` as *variable* resets the environment variables
   from the *context* given by the specified *config* or the default.
+  Giving *value* allows optionally to override the value of the
+  environment variable.
 
 - \[`-m`|`--mount` *mount*\]:
   Pass dotfile to encapsulated command. The *mount* argument has to

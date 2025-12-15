@@ -2,6 +2,11 @@
 ChangeLog
 =========
 
+1.1.0 (2025-12-16)
+------------------
+
+- IMPROVEMENT: let option -e/--env accept also values
+
 1.0.2 (2025-12-15)
 ------------------
 

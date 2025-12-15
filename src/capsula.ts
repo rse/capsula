@@ -89,7 +89,7 @@ const spool = new Spool()
             "[-d|--docker <docker>]",
             "[-c|--context <context>]",
             "[-s|--sudo]",
-            "[-e|--env <variable>]",
+            "[-e|--env <variable>[=<value>]]",
             "[-m|--mount <dotfile>]",
             "[-p|--port <port>]",
             "[-I|--image <image-name>]",
@@ -415,6 +415,7 @@ const spool = new Spool()
     }
     for (const env of envs)
         opts.push("-e", env)
+    envs = envs.map((env) => env.replace(/^([^=]+)=.*$/, "$1"))
 
     /*  determine dotfile mounts to expose  */
     let mounts: string[] =
