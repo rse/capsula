@@ -156,27 +156,38 @@ Option `-p`/`--port` can be used to override the section `port`.
 
 ## EXAMPLE
 
-The following installs *Node.js* and establishes a global package
-environment for the user inside an encapsulated environment:
+The following installs *Node.js* and *Claude Code* inside an
+encapsulated environment:
 
 ```sh
-$ capsula -s sudo apt update
-$ capsula -s bash -c \
-  "curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -"
-$ capsula -s sudo apt install -y nodejs
-$ NPM=/npm
-$ export NPM_CONFIG_PREFIX=$NPM
-$ export NPM_CONFIG_CACHE=$NPM/.cache
-$ capsula -e NPM -s sudo bash -c 'mkdir $NPM && chown $USER:$GROUP $NPM'
-```
+# update system
+capsula -s sudo apt update
+capsula -s sudo apt upgrade
 
-The following installs and runs *Claude Code* inside an encapsulated
-environment:
+# install Node.js
+capsula -s bash -c \
+    "curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -"
+capsula -s sudo apt install -y nodejs
 
-```sh
-$ capsula -e NPM_CONFIG_PREFIX -e NPM_CONFIG_CACHE \
-  npm install -g @anthropic-ai/claude-code
-$ capsula /npm/bin/claude
+# configure NPM environment
+yq -i '.claude.env += [ "NPM=/npm" ]' ~/.capsula.yaml
+yq -i '.claude.env += [ "NPM_CONFIG_PREFIX=/npm" ]' ~/.capsula.yaml
+yq -i '.claude.env += [ "NPM_CONFIG_CACHE=/npm/.cache" ]' ~/.capsula.yaml
+capsula -s sudo bash -c 'mkdir $NPM && chown $USER:$GROUP $NPM'
+
+# install Claude Code and companion tools into NPM environment
+capsula npm install -y -g @anthropic-ai/claude-code
+capsula npm install -y -g ccstatusline
+capsula npm install -y -g tweakcc
+
+# configure Claude Code environment
+yq -i '.claude.mount += [ ".claude/" ]' ~/.capsula.yaml
+yq -i '.claude.mount += [ ".claude.json" ]' ~/.capsula.yaml
+yq -i '.claude.mount += [ ".config/ccstatusline/" ]' ~/.capsula.yaml
+yq -i '.claude.mount += [ ".tweakcc/" ]' ~/.capsula.yaml
+
+# use Claude Code
+echo 'alias claude="capsula -s claude /npm/bin/claude"' >~/.dotfiles/bashrc
 ```
 
 ## DESIGN
