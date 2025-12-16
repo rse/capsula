@@ -157,7 +157,7 @@ Option `-p`/`--port` can be used to override the section `port`.
 ## EXAMPLE
 
 The following installs *Node.js* and *Claude Code* inside an
-encapsulated environment:
+encapsulated environment with the help of `capsula`(1) and `yq`(1):
 
 ```sh
 # update system
@@ -230,7 +230,7 @@ commands with the following distinct design:
 
 ## SEE ALSO
 
-docker(1).
+`docker`(1), `yq`(1).
 
 ## HISTORY
 
