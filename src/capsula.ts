@@ -338,7 +338,7 @@ const spool = new Spool()
                 })
 
                 /*  support spinner (part 2)  */
-                response.all.on("data", (chunk: any) => {
+                response.all.on("data", (chunk: Buffer | string) => {
                     const lines = chunk.toString().split(/\r?\n/)
                     if (spinner !== null) {
                         spinner.text = `${docker}: | ${lines[0]}`
