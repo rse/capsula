@@ -187,7 +187,7 @@ yq -i '.claude.mount += [ ".config/ccstatusline/" ]' ~/.capsula.yaml
 yq -i '.claude.mount += [ ".tweakcc/" ]' ~/.capsula.yaml
 
 # use Claude Code
-echo 'alias claude="capsula -s claude /npm/bin/claude"' >~/.dotfiles/bashrc
+echo 'alias claude="capsula -c claude /npm/bin/claude"' >~/.dotfiles/bashrc
 ```
 
 ## DESIGN
