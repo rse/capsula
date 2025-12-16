@@ -6,6 +6,7 @@ ChangeLog
 ------------------
 
 - IMPROVEMENT: let option -e/--env accept also values
+- IMPROVEMENT: allow options to be overridden by environment variables
 
 1.0.2 (2025-12-15)
 ------------------

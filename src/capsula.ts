@@ -109,7 +109,7 @@ const spool = new Spool()
             alias:    "f",
             type:     "string",
             coerce:   coerceS<string>,
-            default:  path.join(os.homedir(), ".capsula.yaml"),
+            default:  process.env.CAPSULA_CONFIG ?? path.join(os.homedir(), ".capsula.yaml"),
             describe: "set context configuration file"
         })
         .option("log-level", {
@@ -117,7 +117,7 @@ const spool = new Spool()
             type:     "string",
             nargs:    1,
             coerce:   coerceS<string>,
-            default:  "info",
+            default:  process.env.CAPSULA_LOGLEVEL ?? "info",
             choices:  [ "error", "warning", "info", "debug" ] as const,
             describe: "set logging level"
         })
@@ -125,7 +125,7 @@ const spool = new Spool()
             alias:    "t",
             type:     "string",
             coerce:   coerceS<string>,
-            default:  "debian",
+            default:  process.env.CAPSULA_TYPE ?? "debian",
             choices:  [ "alpine", "debian", "ubuntu", "alma", "fedora", "arch", "opensuse" ] as const,
             describe: "set Linux platform type to use for container"
         })
@@ -133,7 +133,7 @@ const spool = new Spool()
             alias:    "d",
             type:     "string",
             coerce:   coerceS<string>,
-            default:  "",
+            default:  process.env.CAPSULA_DOCKER ?? "",
             describe: "set docker(1) compatible tool"
         })
         .option("context", {
@@ -141,56 +141,56 @@ const spool = new Spool()
             type:     "string",
             nargs:    1,
             coerce:   coerceS<string>,
-            default:  "default",
+            default:  process.env.CAPSULA_CONTEXT ?? "default",
             describe: "unique context name"
         })
         .option("sudo", {
             alias:    "s",
             type:     "boolean",
             coerce:   coerceS<boolean>,
-            default:  false,
+            default:  process.env.CAPSULA_SUDO ? /^(true|1|yes)$/i.test(process.env.CAPSULA_SUDO) : false,
             describe: "enable sudo(8) for user in container"
         })
         .option("env", {
             alias:    "e",
             type:     "string",
             coerce:   coerceA<string>,
-            default:  [],
+            default:  process.env.CAPSULA_ENV ? process.env.CAPSULA_ENV.split(/[\s,]+/) : [],
             describe: "pass environment variable to encapsulated command"
         })
         .option("mount", {
             alias:    "m",
             type:     "string",
             coerce:   coerceA<string>,
-            default:  [],
+            default:  process.env.CAPSULA_MOUNT ? process.env.CAPSULA_MOUNT.split(/[\s,]+/) : [],
             describe: "pass additional dotfile to encapsulated command"
         })
         .option("port", {
             alias:    "p",
             type:     "string",
             coerce:   coerceA<string>,
-            default:  [],
+            default:  process.env.CAPSULA_PORT ? process.env.CAPSULA_PORT.split(/[\s,]+/) : [],
             describe: "pass additional port to encapsulated command"
         })
         .option("image", {
             alias:    "I",
             type:     "string",
             coerce:   coerceS<string>,
-            default:  "",
+            default:  process.env.CAPSULA_IMAGE ?? "",
             describe: "set name of Docker container image"
         })
         .option("container", {
             alias:    "C",
             type:     "string",
             coerce:   coerceS<string>,
-            default:  "",
+            default:  process.env.CAPSULA_CONTAINER ?? "",
             describe: "set name of Docker container"
         })
         .option("volume", {
             alias:    "V",
             type:     "string",
             coerce:   coerceS<string>,
-            default:  "",
+            default:  process.env.CAPSULA_VOLUME ?? "",
             describe: "set name of Docker volume"
         })
         .help("h", "show usage help")

@@ -154,6 +154,63 @@ Option `-e`/`--env` can be used to override the section `env`.
 Option `-m`/`--mount` can be used to override the section `mount`.
 Option `-p`/`--port` can be used to override the section `port`.
 
+## ENVIRONMENT
+
+The following environment variables can be used to provide
+default values for the corresponding command-line options:
+
+- `CAPSULA_CONFIG`:
+  Default value for option `-f`/`--config`.
+  If not set, defaults to `$HOME/.capsula.yaml`.
+
+- `CAPSULA_LOGLEVEL`:
+  Default value for option `-l`/`--log-level`.
+  If not set, defaults to `info`.
+
+- `CAPSULA_TYPE`:
+  Default value for option `-t`/`--type`.
+  If not set, defaults to `debian`.
+
+- `CAPSULA_DOCKER`:
+  Default value for option `-d`/`--docker`.
+  If not set, auto-detects `docker`, `podman`, or `nerdctl`.
+
+- `CAPSULA_CONTEXT`:
+  Default value for option `-c`/`--context`.
+  If not set, defaults to `default`.
+
+- `CAPSULA_SUDO`:
+  Default value for option `-s`/`--sudo`.
+  Set to `true`, `1`, or `yes` (case-insensitive) to enable.
+  If not set, defaults to `false`.
+
+- `CAPSULA_ENV`:
+  Default value for option `-e`/`--env`.
+  Multiple values can be separated by whitespace or comma.
+  If not set, defaults to an empty list.
+
+- `CAPSULA_MOUNT`:
+  Default value for option `-m`/`--mount`.
+  Multiple values can be separated by whitespace or comma.
+  If not set, defaults to an empty list.
+
+- `CAPSULA_PORT`:
+  Default value for option `-p`/`--port`.
+  Multiple values can be separated by whitespace or comma.
+  If not set, defaults to an empty list.
+
+- `CAPSULA_IMAGE`:
+  Default value for option `-I`/`--image`.
+  If not set, the image name is auto-generated.
+
+- `CAPSULA_CONTAINER`:
+  Default value for option `-C`/`--container`.
+  If not set, the container name is auto-generated.
+
+- `CAPSULA_VOLUME`:
+  Default value for option `-V`/`--volume`.
+  If not set, the volume name is auto-generated.
+
 ## EXAMPLE
 
 The following installs *Node.js* and *Claude Code* inside an
