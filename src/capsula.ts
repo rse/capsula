@@ -219,7 +219,7 @@ const spool = new Spool()
 
     /*  helper function wrapping execa()  */
     const exec = <T extends Options>(cmd: string, args: string[], opts: T) => {
-        const str = [ cmd, ...args ].map((x) => x.match(/\s/) ? `'${x.replace(/'/g, "\\'")}'` : x).join(" ")
+        const str = [ cmd, ...args ].map((x) => x.match(/\s/) ? `'${x.replace(/'/g, "'\\''")}'` : x).join(" ")
         const options: string[] = []
         if (opts.cwd)
             options.push(`cwd: ${chalk.blue(opts.cwd)}`)
