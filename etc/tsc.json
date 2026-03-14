@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-		"outDir":                  "../dst-stage1",
+        "outDir":                  "../dst-stage1",
         "target":                  "esnext",
         "module":                  "esnext",
         "moduleResolution":        "bundler",
@@ -16,8 +16,8 @@
         "types":                   [ "node" ],
         "rootDir":                 "../src"
     },
-	"include": [
-		"../src/**/*.ts",
-		"../package.json"
+    "include": [
+        "../src/**/*.ts",
+        "../package.json"
     ]
 }
