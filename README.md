@@ -248,7 +248,7 @@ commands with the following distinct design:
 License
 -------
 
-Copyright &copy; 2025 Dr. Ralf S. Engelschall (http://engelschall.com/)
+Copyright &copy; 2025-2026 Dr. Ralf S. Engelschall (http://engelschall.com/)
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
