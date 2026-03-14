@@ -2,11 +2,22 @@
 ChangeLog
 =========
 
-1.1.0 (2025-12-16)
+1.1.0 (2026-03-14)
 ------------------
 
 - IMPROVEMENT: let option -e/--env accept also values
 - IMPROVEMENT: allow options to be overridden by environment variables
+- IMPROVEMENT: factor out common code
+- IMPROVEMENT: improve type safety
+- IMPROVEMENT: improve rendering
+- IMPROVEMENT: provide more elaborative usage example
+- BUGFIX: fix shell escaping
+- BUGFIX: fix option handling
+- BUGFIX: avoid compiler warning
+- UPDATE: upgrade NPM dependencies
+- CLEANUP: update year in copyright messages
+- CLEANUP: replace tabs with spaces
+- CLEANUP: add missing trailing blank line
 
 1.0.2 (2025-12-15)
 ------------------
