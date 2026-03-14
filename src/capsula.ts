@@ -53,7 +53,7 @@ class Spool {
     async unroll () {
         const resource = this.resources.pop()
         if (resource === undefined)
-            throw new Error("still no resource spooled")
+            throw new Error("no resource to unroll")
         const response = resource.onUnroll(resource.resource)
         if (response instanceof Promise)
             await response
@@ -260,20 +260,27 @@ const spool = new Spool()
         Object.assign(config, obj)
     }
 
+    /*  determine user/group information  */
+    const ui  = os.userInfo()
+    const usr = ui.username
+    const uid = ui.uid.toString()
+    const gid = ui.gid.toString()
+
     /*  define the container volume, container image and container names  */
-    const username  = os.userInfo().username
     const timestamp = DateTime.now().toFormat("yyyy-MM-dd-HH-mm-ss-SSS")
     const nameImage = args.image !== "" ? args.image :
-        `capsula-${username}-${args.type}-${args.context}:${pkg.version}`
+        `capsula-${usr}-${args.type}-${args.context}:${pkg.version}`
     const nameContainer = args.container !== "" ? args.container :
-        `capsula-${username}-${args.type}-${args.context}-${timestamp}`
+        `capsula-${usr}-${args.type}-${args.context}-${timestamp}`
     const nameVolume = args.volume !== "" ? args.volume :
-        `capsula-${username}-${args.type}-${args.context}`
+        `capsula-${usr}-${args.type}-${args.context}`
 
     /*  determine docker(1) compatible tool  */
-    const haveDocker  = await existsTool("docker")
-    const havePodman  = await existsTool("podman")
-    const haveRancher = await existsTool("nerdctl")
+    const [ haveDocker, havePodman, haveRancher ] = await Promise.all([
+        existsTool("docker"),
+        existsTool("podman"),
+        existsTool("nerdctl")
+    ])
     const docker = (
         args.docker !== "" ? args.docker : (
             haveDocker ? "docker" : (
@@ -386,11 +393,7 @@ const spool = new Spool()
             .catch((err: any) => { throw new Error(`failed to create persistent volume: ${err.message ?? err}`) })
     }
 
-    /*  determine user/group information  */
-    const ui = os.userInfo()
-    const uid = ui.uid.toString()
-    const gid = ui.gid.toString()
-    const usr = ui.username
+    /*  determine group name  */
     await ensureTool("id")
     const response = await exec("id", [ "-g", "-n" ], { stdio: [ "ignore", "pipe", "ignore" ] })
         .catch((err: any) => { throw new Error(`failed to determine group name: ${err.message ?? err}`) })
