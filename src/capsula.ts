@@ -309,14 +309,16 @@ const spool = new Spool()
             /*  create Dockerfile  */
             const dockerfile = path.join(tmpdir.name, "Dockerfile")
             subSpool.roll(dockerfile, (dockerfile) => fs.promises.unlink(dockerfile))
-            const dockerfileText =
-                args.type === "alpine" ? rawDockerAlpine :
-                    args.type === "debian" ? rawDockerDebian :
-                        args.type === "ubuntu" ? rawDockerUbuntu :
-                            args.type === "alma" ? rawDockerAlma :
-                                args.type === "fedora" ? rawDockerFedora :
-                                    args.type === "arch" ? rawDockerArch :
-                                        args.type === "opensuse" ? rawDockerOpenSUSE : ""
+            const dockerfileMap: Record<string, string> = {
+                alpine:   rawDockerAlpine,
+                debian:   rawDockerDebian,
+                ubuntu:   rawDockerUbuntu,
+                alma:     rawDockerAlma,
+                fedora:   rawDockerFedora,
+                arch:     rawDockerArch,
+                opensuse: rawDockerOpenSUSE
+            }
+            const dockerfileText = dockerfileMap[args.type] ?? ""
             await fs.promises.writeFile(dockerfile, dockerfileText, { encoding: "utf8" })
 
             /*  create entrypoint script  */
