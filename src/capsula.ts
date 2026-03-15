@@ -413,32 +413,26 @@ const spool = new Spool()
     /*  start assembling "docker" options  */
     const opts: string[] = []
 
-    /*  determine environment variables to expose  */
-    let envs: string[] =
-        config[args.context]?.env ??
-        config.default?.env ??
-        []
-    for (const env of args.env) {
-        if (env === "!")
-            envs = []
-        else
-            envs.push(env)
+    /*  helper function for merging a list with reset support  */
+    const mergeList = (base: string[], overrides: string[]) => {
+        const result = [ ...base ]
+        for (const item of overrides) {
+            if (item === "!")
+                result.length = 0
+            else
+                result.push(item)
+        }
+        return result
     }
+
+    /*  determine environment variables to expose  */
+    let envs: string[] = mergeList(config[args.context]?.env ?? config.default?.env ?? [], args.env)
     for (const env of envs)
         opts.push("-e", env)
     envs = envs.map((env) => env.replace(/^([^=]+)=.*$/, "$1"))
 
     /*  determine dotfile mounts to expose  */
-    let mounts: string[] =
-        config[args.context]?.mount ??
-        config.default?.mount ??
-        []
-    for (const mount of args.mount) {
-        if (mount === "!")
-            mounts = []
-        else
-            mounts.push(mount)
-    }
+    const mounts: string[] = mergeList(config[args.context]?.mount ?? config.default?.mount ?? [], args.mount)
     for (let mount of mounts) {
         let ro = true
         if (mount.endsWith("!")) {
@@ -451,16 +445,7 @@ const spool = new Spool()
     }
 
     /*  determine external bind mounts to expose  */
-    let binds: string[] =
-        config[args.context]?.bind ??
-        config.default?.bind ??
-        []
-    for (const bind of args.bind) {
-        if (bind === "!")
-            binds = []
-        else
-            binds.push(bind)
-    }
+    const binds: string[] = mergeList(config[args.context]?.bind ?? config.default?.bind ?? [], args.bind)
     const bindPaths: string[] = []
     for (let bind of binds) {
         let ro = true
@@ -482,16 +467,7 @@ const spool = new Spool()
         throw new Error(`working directory ${chalk.blue(workdir)} not below home directory ${chalk.blue(home)} or any bind-mounted directory`)
 
     /*  determine ports to expose  */
-    let ports: string[] =
-        config[args.context]?.port ??
-        config.default?.port ??
-        []
-    for (const port of args.port) {
-        if (port === "!")
-            ports = []
-        else
-            ports.push(port)
-    }
+    const ports: string[] = mergeList(config[args.context]?.port ?? config.default?.port ?? [], args.port)
     for (const port of ports)
         opts.push("-p", `${port}:${port}`)
 
