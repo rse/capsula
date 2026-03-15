@@ -5,6 +5,7 @@ ChangeLog
 1.2.1 (2026-03-15)
 ------------------
 
+- CLEANUP: various code cleanups (improve readability, type safety, and structure)
 - CLEANUP: update README.md for latest changes
 
 1.2.0 (2026-03-15)
