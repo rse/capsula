@@ -31,10 +31,14 @@ Prerequisites
 
 Ensure that in your shell path one of the commands `docker`,
 `podman` or `nerdctl` exists. For this, under Linux install either
-[*Docker*](https://www.docker.com/) or [*Podman*](https://podman.io/).
-Under macOS or Windows alternatively install either
+[*Docker*](https://www.docker.com/),
 [*Docker Desktop*](https://www.docker.com/products/docker-desktop/),
-[*Podman Desktop*](https://podman-desktop.io/) or
+[*Podman*](https://podman.io/),
+[*Podman Desktop*](https://podman-desktop.io/), or
+[*Rancher Desktop*](https://rancherdesktop.io/).
+Under macOS or Windows install either
+[*Docker Desktop*](https://www.docker.com/products/docker-desktop/),
+[*Podman Desktop*](https://podman-desktop.io/), or
 [*Rancher Desktop*](https://rancherdesktop.io/).
 Additionally, install the runtime [Node.js](https://nodejs.org)
 when you are planning to install **Capsula** with NPM (see below).
