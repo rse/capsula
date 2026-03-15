@@ -226,8 +226,8 @@ const spool = new Spool()
     })
 
     /*  helper function wrapping execa()  */
-    const exec = <T extends Options>(cmd: string, args: string[], opts: T) => {
-        const str = [ cmd, ...args ].map((x) => x.match(/\s/) ? `'${x.replace(/'/g, "'\\''")}'` : x).join(" ")
+    const exec = <T extends Options>(cmd: string, cmdArgs: string[], opts: T) => {
+        const str = [ cmd, ...cmdArgs ].map((x) => x.match(/\s/) ? `'${x.replace(/'/g, "'\\''")}'` : x).join(" ")
         const options: string[] = []
         if (opts.cwd)
             options.push(`cwd: ${chalk.blue(opts.cwd)}`)
@@ -237,7 +237,7 @@ const spool = new Spool()
             options.push(`stdio: ${chalk.blue(JSON.stringify(opts.stdio))}`)
         cli!.log("debug", `executing command: $ ${chalk.bold(str)}` +
             `${options.length > 0 ? ` (${options.join(", ")})` : ""}`)
-        return execa(cmd, args, opts)
+        return execa(cmd, cmdArgs, opts)
     }
 
     /*  helper function for ensuring a tool is available  */
