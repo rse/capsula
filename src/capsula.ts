@@ -91,6 +91,7 @@ const spool = new Spool()
             "[-s|--sudo]",
             "[-e|--env <variable>[=<value>]]",
             "[-m|--mount <dotfile>]",
+            "[-b|--bind <path>]",
             "[-p|--port <port>]",
             "[-I|--image <image-name>]",
             "[-C|--container <container-name>]",
@@ -164,6 +165,13 @@ const spool = new Spool()
             coerce:   coerceA<string>,
             default:  process.env.CAPSULA_MOUNT ? process.env.CAPSULA_MOUNT.split(/[\s,]+/) : [],
             describe: "pass additional dotfile to encapsulated command"
+        })
+        .option("bind", {
+            alias:    "b",
+            type:     "string",
+            coerce:   coerceA<string>,
+            default:  process.env.CAPSULA_BIND ? process.env.CAPSULA_BIND.split(/[\s,]+/) : [],
+            describe: "bind-mount external directory into container"
         })
         .option("port", {
             alias:    "p",
@@ -249,8 +257,6 @@ const spool = new Spool()
     const home    = os.homedir()
     cli!.log("debug", `home directory: ${chalk.blue(home)}`)
     cli!.log("debug", `working directory: ${chalk.blue(workdir)}`)
-    if (!workdir.startsWith(`${home}${path.sep}`))
-        throw new Error(`working directory ${chalk.blue(workdir)} not below home directory ${chalk.blue(home)}`)
 
     /*  load configurations  */
     const config = jsYAML.parse(rawDefaults)
@@ -442,6 +448,37 @@ const spool = new Spool()
         opts.push("-v", `${mountPath}:/mnt/fs-home${mountPath}${mountOption}`)
     }
 
+    /*  determine external bind mounts to expose  */
+    let binds: string[] =
+        config[args.context]?.bind ??
+        config.default?.bind ??
+        []
+    for (const bind of args.bind) {
+        if (bind === "!")
+            binds = []
+        else
+            binds.push(bind)
+    }
+    const bindPaths: string[] = []
+    for (let bind of binds) {
+        let ro = true
+        if (bind.endsWith("!")) {
+            ro = false
+            bind = bind.replace(/!$/, "")
+        }
+        if (!path.isAbsolute(bind))
+            throw new Error(`bind path ${chalk.blue(bind)} has to be an absolute path`)
+        bindPaths.push(bind)
+        const bindOption = ro ? ":ro" : ""
+        opts.push("-v", `${bind}:/mnt/fs-bind${bind}${bindOption}`)
+    }
+
+    /*  validate working directory (after bind processing)  */
+    const workdirAllowed = workdir.startsWith(`${home}${path.sep}`)
+        || bindPaths.some((bp) => workdir === bp || workdir.startsWith(`${bp}${path.sep}`))
+    if (!workdirAllowed)
+        throw new Error(`working directory ${chalk.blue(workdir)} not below home directory ${chalk.blue(home)} or any bind-mounted directory`)
+
     /*  determine ports to expose  */
     let ports: string[] =
         config[args.context]?.port ??
@@ -488,6 +525,7 @@ const spool = new Spool()
         home,
         workdir,
         mounts.join(" "),
+        binds.join(" "),
         envs.join(" "),
         args.sudo ? "yes" : "no",
 

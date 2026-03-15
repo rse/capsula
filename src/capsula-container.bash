@@ -15,6 +15,7 @@ gid="$1";      shift
 homedir="$1";  shift
 workdir="$1";  shift
 dotfiles="$1"; shift
+binds="$1";    shift
 envvars="$1";  shift
 sudo="$1";     shift
 
@@ -66,6 +67,25 @@ for dotfile in $dotfiles; do
         continue
     fi
     mount --move "/mnt/fs-home$homedir/$dotfile" "/mnt/fs-root$homedir/$dotfile"
+done
+
+#   remount custom Docker bind mounts for external binds
+for bind in $binds; do
+    ro="true"
+    if [[ $bind =~ .*!$ ]]; then
+        ro="false"
+        bind="${bind%!}"
+    fi
+    if [[ -d "/mnt/fs-bind$bind" ]]; then
+        mkdir -p "/mnt/fs-root$bind"
+    elif [[ -f "/mnt/fs-bind$bind" ]]; then
+        mkdir -p "$(dirname "/mnt/fs-root$bind")"
+        touch "/mnt/fs-root$bind"
+    else
+        echo "capsula: WARNING: bind-path \"$bind\" neither directory nor file" 1>&2
+        continue
+    fi
+    mount --move "/mnt/fs-bind$bind" "/mnt/fs-root$bind"
 done
 
 #   remount custom Docker bind mount for working directory

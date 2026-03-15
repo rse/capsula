@@ -2,6 +2,11 @@
 ChangeLog
 =========
 
+1.2.0 (2026-03-15)
+------------------
+
+- IMPROVEMENT: support bind-mounting arbitrary paths
+
 1.1.0 (2026-03-14)
 ------------------
 

@@ -19,6 +19,7 @@ default:
         - .gitconfig
         - .npmrc
         - .cache!
+    bind: []
     port:
         - 8888
 

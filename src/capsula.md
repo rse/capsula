@@ -14,6 +14,7 @@
 \[`-s`|`--sudo`\]
 \[`-e`|`--env` *variable*\[`=`*value*\]\]
 \[`-m`|`--mount` *dotfile*\]
+\[`-b`|`--bind` *path*\]
 \[`-p`|`--port` *port*\]
 \[`-I`|`--image` *image-name*\]
 \[`-C`|`--container` *container-name*\]
@@ -74,11 +75,20 @@ The following command-line options and arguments exist to the `capsula(1)` comma
   Giving *value* allows optionally to override the value of the
   environment variable.
 
-- \[`-m`|`--mount` *mount*\]:
-  Pass dotfile to encapsulated command. The *mount* argument has to
-  be a pathname relative to the current user's home directory. This
-  option can be given multiple times. Passing `!` as *mount* resets the
-  dotfiles from the *context* given by the specified *config* or the
+- \[`-m`|`--mount` *dotfile*\]:
+  Pass dotfile to encapsulated command. The *dotfile* argument has to
+  be a pathname relative to the current user's home directory. The
+  mount is read-only by default. Appending `!` to the *dotfile* makes it
+  read-write. This option can be given multiple times. Passing `!` as
+  *dotfile* resets the dotfiles from the *context* given by the specified
+  *config* or the default.
+
+- \[`-b`|`--bind` *path*\]:
+  Bind-mount an external directory into the container. The *path*
+  argument has to be an absolute pathname. The bind mount is read-only
+  by default. Appending `!` to the *path* makes it read-write. This
+  option can be given multiple times. Passing `!` as *path* resets the
+  bind mounts from the *context* given by the specified *config* or the
   default.
 
 - \[`-p`|`--port` *port*\]:
@@ -145,6 +155,7 @@ default:
         - .gitconfig
         - .npmrc
         - .cache!
+    bind: []
     port:
         - 8888
 ```
@@ -152,6 +163,7 @@ default:
 An overriding custom configuration file can be given with option `-f`/`--config`.
 Option `-e`/`--env` can be used to override the section `env`.
 Option `-m`/`--mount` can be used to override the section `mount`.
+Option `-b`/`--bind` can be used to override the section `bind`.
 Option `-p`/`--port` can be used to override the section `port`.
 
 ## ENVIRONMENT
@@ -191,6 +203,11 @@ default values for the corresponding command-line options:
 
 - `CAPSULA_MOUNT`:
   Default value for option `-m`/`--mount`.
+  Multiple values can be separated by whitespace or comma.
+  If not set, defaults to an empty list.
+
+- `CAPSULA_BIND`:
+  Default value for option `-b`/`--bind`.
   Multiple values can be separated by whitespace or comma.
   If not set, defaults to an empty list.
 
@@ -276,7 +293,16 @@ commands with the following distinct design:
    *RATIONALE*: This allows one to run the command inside the container
    with the same configuration as it is available on the host.
 
-4. *Parent Paths inside Root Directory* (root read/write):
+4. *External Bind Mounts* (user read-only or read-write):
+   Arbitrary directories outside the home directory can be bind-mounted
+   into the container with their original paths preserved.
+   By default, external bind mounts are read-only. Appending `!` to
+   the path makes them read-write.
+   *RATIONALE*: This allows commands inside the container to access
+   external data directories (e.g., `/data/projects`, `/opt/tools`)
+   without granting access to the entire host filesystem.
+
+5. *Parent Paths inside Root Directory* (root read/write):
    The parent directories of the home directory
    up to the root directory are exactly those as provided by the
    Linux container operating system, but changes are
