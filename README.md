@@ -68,6 +68,7 @@ $ `capsula`
 \[`-s`|`--sudo`\]
 \[`-e`|`--env` *variable*\]
 \[`-m`|`--mount` *dotfile*\]
+\[`-b`|`--bind` *path*\]
 \[`-p`|`--port` *port*\]
 \[`-I`|`--image` *image-name*\]
 \[`-C`|`--container` *container-name*\]
@@ -112,11 +113,20 @@ The particular command-line options and arguments are:
   Passing `!` as *variable* resets the environment variables
   from the *context* given by the specified *config* or the default.
 
-- \[`-m`|`--mount` *mount*\]:
+- \[`-m`|`--mount` *dotfile*\]:
   Pass dotfile to encapsulated command.
-  The *mount* argument has to be a pathname relative to the current user's home directory.
+  The *dotfile* argument has to be a pathname relative to the current user's home directory.
+  The mount is read-only by default. Appending `!` to the *dotfile* makes it read-write.
   This option can be given multiple times.
-  Passing `!` as *mount* resets the dotfiles
+  Passing `!` as *dotfile* resets the dotfiles
+  from the *context* given by the specified *config* or the default.
+
+- \[`-b`|`--bind` *path*\]:
+  Bind-mount an external directory into the container.
+  The *path* argument has to be an absolute pathname.
+  The bind mount is read-only by default. Appending `!` to the *path* makes it read-write.
+  This option can be given multiple times.
+  Passing `!` as *path* resets the bind mounts
   from the *context* given by the specified *config* or the default.
 
 - \[`-p`|`--port` *port*\]:
@@ -184,6 +194,7 @@ default:
         - .gitconfig
         - .npmrc
         - .cache!
+    bind: []
     port:
         - 8888
 ```
@@ -191,6 +202,7 @@ default:
 An overriding custom configuration file can be given with option `-f`/`--config`.
 Option `-e`/`--env` can be used to override the section `env`.
 Option `-m`/`--mount` can be used to override the section `mount`.
+Option `-b`/`--bind` can be used to override the section `bind`.
 Option `-p`/`--port` can be used to override the section `port`.
 
 Example
