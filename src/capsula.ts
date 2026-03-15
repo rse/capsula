@@ -385,8 +385,8 @@ const spool = new Spool()
                     reject(err)
                 })
             })
-        })().catch((err: any) => {
-            throw new Error(`failed to build container: ${err?.message ?? err}`)
+        })().catch((err: unknown) => {
+            throw new Error(`failed to build container: ${err instanceof Error ? err.message : err}`)
         }).finally(async () => {
             await spool.unroll()
         })
@@ -398,13 +398,13 @@ const spool = new Spool()
     if (!volumeExists) {
         cli.log("info", `creating persistent volume ${chalk.blue(nameVolume)}`)
         await exec(docker, [ "volume", "create", nameVolume ], { stdio: "ignore" })
-            .catch((err: any) => { throw new Error(`failed to create persistent volume: ${err.message ?? err}`) })
+            .catch((err: unknown) => { throw new Error(`failed to create persistent volume: ${err instanceof Error ? err.message : err}`) })
     }
 
     /*  determine group name  */
     await ensureTool("id")
     const response = await exec("id", [ "-g", "-n" ], { stdio: [ "ignore", "pipe", "ignore" ] })
-        .catch((err: any) => { throw new Error(`failed to determine group name: ${err.message ?? err}`) })
+        .catch((err: unknown) => { throw new Error(`failed to determine group name: ${err instanceof Error ? err.message : err}`) })
     const grp = response.stdout.trim()
 
     /*  determine host information  */
