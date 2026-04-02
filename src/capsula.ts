@@ -22,6 +22,7 @@ import tmp                     from "tmp"
 import jsYAML                  from "yaml"
 import Ora                     from "ora"
 import { DateTime }            from "luxon"
+import deepmerge               from "deepmerge"
 
 /*  internal dependencies  */
 import pkg                     from "../package.json"                             with { type: "json"   }
@@ -263,7 +264,8 @@ const spool = new Spool()
     if (fs.existsSync(args.config)) {
         const yaml = fs.readFileSync(args.config, { encoding: "utf8" })
         const obj = jsYAML.parse(yaml)
-        Object.assign(config, obj)
+        const merged = deepmerge(config, obj, { arrayMerge: (_dst: unknown[], src: unknown[]) => src })
+        Object.assign(config, merged)
     }
 
     /*  determine user/group information  */

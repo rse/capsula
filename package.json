@@ -49,6 +49,7 @@
     },
     "dependencies": {
         "cli-io":                       "0.9.13",
+        "deepmerge":                    "4.3.1",
         "yargs":                        "18.0.0",
         "execa":                        "9.6.1",
         "which":                        "6.0.1",
