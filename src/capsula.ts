@@ -635,17 +635,21 @@ const spool = new Spool()
     })
 
     /*  propagate signals to container child process  */
+    let forceKillScheduled = false
     for (const signal of [ "SIGINT", "SIGTERM" ] as const) {
         process.on(signal, () => {
             result.kill(signal)
 
             /*  force-kill safety net  */
-            setTimeout(safeAsync(async () => {
-                result.kill("SIGKILL")
-                await spool.unroll()
-                const sigNum = os.constants.signals[signal]
-                process.exit(128 + (sigNum ?? 0))
-            }), 10 * 1000).unref()
+            if (!forceKillScheduled) {
+                forceKillScheduled = true
+                setTimeout(safeAsync(async () => {
+                    result.kill("SIGKILL")
+                    await spool.unroll()
+                    const sigNum = os.constants.signals[signal]
+                    process.exit(128 + (sigNum ?? 0))
+                }), 10 * 1000).unref()
+            }
         })
     }
 
