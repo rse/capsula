@@ -14,8 +14,16 @@ grp="$1";      shift
 gid="$1";      shift
 homedir="$1";  shift
 workdir="$1";  shift
-dotfiles="$1"; shift
-binds="$1";    shift
+dotfiles_count="$1"; shift
+dotfiles=()
+for ((i = 0; i < dotfiles_count; i++)); do
+    dotfiles+=("$1"); shift
+done
+binds_count="$1"; shift
+binds=()
+for ((i = 0; i < binds_count; i++)); do
+    binds+=("$1"); shift
+done
 envvars="$1";  shift
 sudo="$1";     shift
 
@@ -51,7 +59,7 @@ mount --move /etc/capsula-container /mnt/fs-root/etc/capsula-container
 
 #   remount custom Docker bind mounts for dotfiles
 mkdir -p "/mnt/fs-root$homedir"
-for dotfile in $dotfiles; do
+for dotfile in "${dotfiles[@]}"; do
     if [[ -d "/mnt/fs-home$homedir/$dotfile" ]]; then
         mkdir -p "/mnt/fs-root$homedir/$dotfile"
     elif [[ -f "/mnt/fs-home$homedir/$dotfile" ]]; then
@@ -65,7 +73,7 @@ for dotfile in $dotfiles; do
 done
 
 #   remount custom Docker bind mounts for external binds
-for bind in $binds; do
+for bind in "${binds[@]}"; do
     if [[ -d "/mnt/fs-bind$bind" ]]; then
         mkdir -p "/mnt/fs-root$bind"
     elif [[ -f "/mnt/fs-bind$bind" ]]; then
