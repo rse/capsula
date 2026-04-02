@@ -337,12 +337,11 @@ const spool = new Spool()
     cli!.log("debug", `working directory: ${chalk.blue(workdir)}`)
 
     /*  load configurations  */
-    const config = jsYAML.parse(rawDefaults)
+    let config = jsYAML.parse(rawDefaults)
     if (fs.existsSync(args.config)) {
         const yaml = fs.readFileSync(args.config, { encoding: "utf8" })
         const obj = jsYAML.parse(yaml)
-        const merged = deepmerge(config, obj, { arrayMerge: (_dst: unknown[], src: unknown[]) => src })
-        Object.assign(config, merged)
+        config = deepmerge(config, obj, { arrayMerge: (_dst: unknown[], src: unknown[]) => src })
     }
 
     /*  determine user/group information  */
