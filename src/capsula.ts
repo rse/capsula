@@ -493,7 +493,7 @@ const spool = new Spool()
         })().catch((err: unknown) => {
             throw new Error(`failed to build container: ${err instanceof Error ? err.message : err}`)
         }).finally(async () => {
-            await spool.unroll()
+            await subSpool.unroll()
         })
     }
 

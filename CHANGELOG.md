@@ -16,6 +16,7 @@ ChangeLog
 - BUGFIX: handle errors in spawning commands
 - BUGFIX: fix internal processing of both an environment variable and a CLI option at the same time
 - BUGFIX: avoid unhandled promise rejection errors caused by async callback functions
+- BUGFIX: unspool the correct spool in case of a "docker build" failure
 - CLEANUP: be more precise in description what to install as prequisites
 - CLEANUP: do not pass the read-only flag of volumes into container as it is unused there
 - UPDATE: upgrade NPM dependencies
