@@ -10,6 +10,7 @@ ChangeLog
 - BUGFIX: avoid double settlement of internal promise and use "close" event of sub-process
 - BUGFIX: correctly handle the signal case in the "exit" handler of "docker run"
 - BUGFIX: correctly propagate signals to container child process and add force-killsafety net
+- BUGFIX: make inspection of docker volume more robust
 - UPDATE: upgrade NPM dependencies
 
 1.2.1 (2026-03-15)

@@ -407,18 +407,29 @@ const spool = new Spool()
     }
 
     /*  create capsula volume  */
-    const volumeExists = await exec(docker, [ "volume", "inspect", nameVolume ], { stdio: "ignore" })
-        .then(() => true).catch(() => false)
+    const volumeInspect = await exec(docker, [ "volume", "inspect", nameVolume ],
+        { stdio: [ "ignore", "ignore", "pipe" ], reject: false })
+    let volumeExists: boolean
+    if (volumeInspect.exitCode === 0)
+        volumeExists = true
+    else if (volumeInspect.stderr.match(/no such volume/i))
+        volumeExists = false
+    else
+        throw new Error(`failed to inspect persistent volume: ${volumeInspect.stderr}`)
     if (!volumeExists) {
         cli.log("info", `creating persistent volume ${chalk.blue(nameVolume)}`)
         await exec(docker, [ "volume", "create", nameVolume ], { stdio: "ignore" })
-            .catch((err: unknown) => { throw new Error(`failed to create persistent volume: ${err instanceof Error ? err.message : err}`) })
+            .catch((err: unknown) => {
+                throw new Error(`failed to create persistent volume: ${err instanceof Error ? err.message : err}`)
+            })
     }
 
     /*  determine group name  */
     await ensureTool("id")
     const response = await exec("id", [ "-g", "-n" ], { stdio: [ "ignore", "pipe", "ignore" ] })
-        .catch((err: unknown) => { throw new Error(`failed to determine group name: ${err instanceof Error ? err.message : err}`) })
+        .catch((err: unknown) => {
+            throw new Error(`failed to determine group name: ${err instanceof Error ? err.message : err}`)
+        })
     const grp = response.stdout.trim()
 
     /*  determine host information  */
