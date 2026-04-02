@@ -578,10 +578,10 @@ const spool = new Spool()
     }
 
     /*  validate working directory (after bind processing)  */
-    const workdirAllowed = workdir.startsWith(`${home}${path.sep}`)
+    const workdirAllowed = workdir === home || workdir.startsWith(`${home}${path.sep}`)
         || bindPaths.some((bp) => workdir === bp || workdir.startsWith(`${bp}${path.sep}`))
     if (!workdirAllowed)
-        throw new Error(`working directory ${chalk.blue(workdir)} is neither strictly below home directory ${chalk.blue(home)} ` +
+        throw new Error(`working directory ${chalk.blue(workdir)} is neither at or below home directory ${chalk.blue(home)} ` +
             "nor at or below any bind-mounted directory")
 
     /*  determine ports to expose  */

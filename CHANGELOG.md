@@ -20,6 +20,7 @@ ChangeLog
 - BUGFIX: do not produce trailing commas for environment variable related sudo option
 - BUGFIX: pass dotfiles and bind information as individual arguments into container for more robustness
 - BUGFIX: correctly quote risky variables in container startup script
+- BUGFIX: allow the user to stay in the home directory as the working directory, too
 - CLEANUP: activate more locales also in Arch container
 - CLEANUP: add error handling to the container startup script
 - CLEANUP: be more precise in description what to install as prequisites

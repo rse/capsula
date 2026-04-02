@@ -60,6 +60,11 @@ mount --move /etc/hosts       /mnt/fs-root/etc/hosts       || fatal "failed to m
 #   remount custom Docker bind mounts for run-command script
 mount --move /etc/capsula-container /mnt/fs-root/etc/capsula-container || fatal "failed to move /etc/capsula-container"
 
+#   remount custom Docker bind mount for working directory
+mkdir -p "/mnt/fs-root$workdir"
+mount --move "/mnt/fs-work$workdir" "/mnt/fs-root$workdir" \
+    || fatal "failed to move working directory"
+
 #   remount custom Docker bind mounts for dotfiles
 mkdir -p "/mnt/fs-root$homedir"
 for dotfile in "${dotfiles[@]}"; do
@@ -90,11 +95,6 @@ for bind in "${binds[@]}"; do
     mount --move "/mnt/fs-bind$bind" "/mnt/fs-root$bind" \
         || fatal "failed to move bind \"$bind\""
 done
-
-#   remount custom Docker bind mount for working directory
-mkdir -p "/mnt/fs-root$workdir"
-mount --move "/mnt/fs-work$workdir" "/mnt/fs-root$workdir" \
-    || fatal "failed to move working directory"
 
 #   switch root filesystem
 mkdir -p /mnt/fs-root/fs-root-old
