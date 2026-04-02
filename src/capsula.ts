@@ -70,7 +70,7 @@ export class Spool {
         const spool = new Spool()
 
         /*  roll sub-spool onto spool  */
-        this.roll(spool, (s) => s.unroll())
+        this.roll(spool, async (s) => { await s.unroll() })
 
         /*  return new spool  */
         return spool
@@ -386,7 +386,7 @@ const spool = new Spool()
 
             /*  create Dockerfile  */
             const dockerfile = path.join(tmpdir.name, "Dockerfile")
-            subSpool.roll(dockerfile, (dockerfile) => fs.promises.unlink(dockerfile))
+            subSpool.roll(dockerfile, async (dockerfile) => { await fs.promises.unlink(dockerfile) })
             const dockerfileMap: Record<string, string> = {
                 alpine:   rawDockerAlpine,
                 debian:   rawDockerDebian,
@@ -401,7 +401,7 @@ const spool = new Spool()
 
             /*  create entrypoint script  */
             const rcfile = path.join(tmpdir.name, "capsula-container.bash")
-            subSpool.roll(rcfile, (rcfile) => fs.promises.unlink(rcfile))
+            subSpool.roll(rcfile, async (rcfile) => { await fs.promises.unlink(rcfile) })
             await fs.promises.writeFile(rcfile, rawBash, { encoding: "utf8" })
 
             /*  build the container image  */
@@ -582,7 +582,7 @@ const spool = new Spool()
     const tmpdir = tmp.dirSync({ mode: 0o750, prefix: "capsula-" })
     subSpool.roll(tmpdir, (tmpdir) => { tmpdir.removeCallback() })
     const rcfile = path.join(tmpdir.name, "capsula-container.bash")
-    subSpool.roll(rcfile, (rcfile) => fs.promises.unlink(rcfile))
+    subSpool.roll(rcfile, async (rcfile) => { await fs.promises.unlink(rcfile) })
     await fs.promises.writeFile(rcfile, rawBash, { mode: 0o750, encoding: "utf8" })
 
     /*  execute command inside encapsulating container  */
