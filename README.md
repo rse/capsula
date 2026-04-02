@@ -105,7 +105,7 @@ The particular command-line options and arguments are:
 
 - \[`-c`|`--context` *context*\]:
   Use a certain context for naming the Docker container and volume.
-  This allows to use separate encapsulations in parallel. The
+  This allows one to use separate encapsulations in parallel. The
   default context is named `default`.
 
 - \[`-s`|`--sudo`\]:
@@ -234,8 +234,8 @@ commands with the following distinct design:
    the directory into the container under the same path as on the host.
    A constraint is that this working directory is either the
    home directory of the user or an arbitrary sub-directory.
-   *RATIONALE*: This allows to execute command inside the container in
-   a mostly identical way, as they would be executed on the host.
+   *RATIONALE*: This allows one to execute commands inside the container in
+   a mostly identical way as they would be executed on the host.
 
 2. *Parent Paths inside Home Directory* (user read-only):
    The parent directories of the current working directory
