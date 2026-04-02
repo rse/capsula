@@ -155,7 +155,7 @@ const spool = new Spool()
 
     /*  parse command-line arguments  */
     const coerceS = <T>(arg: T | T[]): T => Array.isArray(arg) ? arg[arg.length - 1] : arg
-    const coerceA = <T>(arg: T | T[]): T[] => Array.isArray(arg) ? arg : [ arg ]
+    const coerceA = <T>(arg: T | T[]): T[] => (Array.isArray(arg) ? arg : [ arg ]).flat() as T[]
     const args = await yargs()
         .usage([
             "Usage: capsula",
