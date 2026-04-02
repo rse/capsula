@@ -6,6 +6,7 @@ ChangeLog
 ------------------
 
 - CLEANUP: be more precise in description what to install as prequisites
+- UPDATE: upgrade NPM dependencies
 
 1.2.1 (2026-03-15)
 ------------------
