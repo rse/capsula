@@ -494,8 +494,8 @@ const spool = new Spool()
     else if (volumeInspect.stderr.match(/no such volume/i))
         volumeExists = false
     else
-        throw new Error("failed to inspect persistent volume: "
-            + ((volumeInspect.stderr || null) ?? `unknown reason (exit code: ${volumeInspect.exitCode})`))
+        throw new Error("failed to inspect persistent volume: " +
+            ((volumeInspect.stderr || null) ?? `unknown reason (exit code: ${volumeInspect.exitCode})`))
     if (!volumeExists) {
         cli.log("info", `creating persistent volume ${chalk.blue(nameVolume)}`)
         await exec(docker, [ "volume", "create", nameVolume ], { stdio: "ignore" })
