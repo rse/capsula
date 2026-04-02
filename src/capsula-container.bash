@@ -122,16 +122,16 @@ if [[ -n "$envvars" ]]; then
 fi
 
 #   provide same user/group as on host
-if ! getent group $grp >/dev/null 2>&1; then
-    if ! groupadd -f -g $gid $grp; then
+if ! getent group "$grp" >/dev/null 2>&1; then
+    if ! groupadd -f -g "$gid" "$grp"; then
         fatal "failed to create group \"$grp\" ($gid)"
     fi
 fi
-if ! getent passwd $usr >/dev/null 2>&1; then
-    if [[ $platform == "alpine" ]]; then
-        useradd -M -d "$homedir" -s "$SHELL" -u $uid -g $grp $usr >/dev/null 2>&1
+if ! getent passwd "$usr" >/dev/null 2>&1; then
+    if [[ "$platform" == "alpine" ]]; then
+        useradd -M -d "$homedir" -s "$SHELL" -u "$uid" -g "$grp" "$usr" >/dev/null 2>&1
     else
-        useradd -M -d "$homedir" -s "$SHELL" -u $uid -g $grp $usr
+        useradd -M -d "$homedir" -s "$SHELL" -u "$uid" -g "$grp" "$usr"
     fi
     if [[ $? -ne 0 ]]; then
         fatal "failed to create user \"$usr\" ($uid)"
@@ -147,7 +147,7 @@ else
 fi
 
 #   grant access to home directory
-chown $usr:$grp "$homedir"
+chown "$usr:$grp" "$homedir"
 
 #   implicitly change current working directory
 cd "$workdir"
