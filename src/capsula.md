@@ -318,7 +318,7 @@ commands with the following distinct design:
 ## HISTORY
 
 `capsula`(1) was developed in November 2025 to support
-convenient encapsulated execution of sensible programs
+convenient encapsulated execution of sensitive programs
 like `claude`(1) (*Claude Code*) or `codex`(1) (*OpenAI Codex*).
 
 ## AUTHOR
