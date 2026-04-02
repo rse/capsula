@@ -61,7 +61,7 @@ The following command-line options and arguments exist to the `capsula(1)` comma
 
 - \[`-c`|`--context` *context*\]:
   Use a certain context for naming the Docker container and volume.
-  This allows to use separate encapsulations in parallel. The
+  This allows one to use separate encapsulations in parallel. The
   default context is named `default`.
 
 - \[`-s`|`--sudo`\]:
@@ -275,8 +275,8 @@ commands with the following distinct design:
    the directory into the container under the same path as on the host.
    A constraint is that this working directory is either the
    home directory of the user or an arbitrary sub-directory.
-   *RATIONALE*: This allows to execute command inside the container in
-   a mostly identical way, as they would be executed on the host.
+   *RATIONALE*: This allows one to execute commands inside the container in
+   a mostly identical way as they would be executed on the host.
 
 2. *Parent Paths inside Home Directory* (user read-only):
    The parent directories of the current working directory
@@ -307,7 +307,7 @@ commands with the following distinct design:
    up to the root directory are exactly those as provided by the
    Linux container operating system, but changes are
    persisted across container usages in a Docker volume.
-   *RATIONALE*: This allows to permanently install tools (as `root` via `sudo`(8))
+   *RATIONALE*: This allows one to permanently install tools (as `root` via `sudo`(8))
    into the container in an arbitrary way without having
    to build a custom container image.
 
