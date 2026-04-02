@@ -11,6 +11,8 @@ ChangeLog
 - BUGFIX: correctly handle the signal case in the "exit" handler of "docker run"
 - BUGFIX: correctly propagate signals to container child process and add force-killsafety net
 - BUGFIX: make inspection of docker volume more robust
+- BUGFIX: avoid "unhandled promise rejection" errors on spawning commands
+- BUGFIX: handle errors in spawning commands
 - UPDATE: upgrade NPM dependencies
 
 1.2.1 (2026-03-15)

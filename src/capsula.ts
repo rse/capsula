@@ -398,6 +398,9 @@ const spool = new Spool()
                         reject(err)
                     }
                 })
+
+                /*  suppress unhandled promise rejection errors  */
+                response.catch(() => {})
             })
         })().catch((err: unknown) => {
             throw new Error(`failed to build container: ${err instanceof Error ? err.message : err}`)
@@ -574,6 +577,17 @@ const spool = new Spool()
                 (signal !== null ? `signal ${chalk.red(signal)}` : `exit code ${chalk.red(exitCode)}`))
         process.exit(exitCode)
     })
+
+    /*  handle execution errors  */
+    result.on("error", async (err) => {
+        /*  cleanup resources and terminate ungracefully  */
+        cli!.log("error", err.message ?? err)
+        await spool.unrollAll()
+        process.exit(1)
+    })
+
+    /*  suppress unhandled promise rejection errors  */
+    result.catch(() => {})
 })().catch(async (err) => {
     /*  cleanup resources and terminate ungracefully  */
     if (cli !== null)
