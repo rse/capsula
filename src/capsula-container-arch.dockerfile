@@ -22,10 +22,14 @@ RUN         pacman -Sy --noconfirm \
                 procps-ng net-tools inetutils htop lsof strace \
                 man-db man-pages
 
-#   reconfigure system for EN/DE and UTF8
+#   reconfigure system for EN/DE and ISO-Latin1/UTF8
 RUN         pacman -Sy --noconfirm glibc glibc-locales
 RUN         sed -i -e 's;^#\(en_US\.UTF-8 UTF-8\);\1;' \
                 -e 's;^#\(en_US ISO-8859-1\);\1;' \
+                -e 's;^#\(en_US\.ISO-8859-15 ISO-8859-15\);\1;' \
+                -e 's;^#\(de_DE\.UTF-8 UTF-8\);\1;' \
+                -e 's;^#\(de_DE ISO-8859-1\);\1;' \
+                -e 's;^#\(de_DE@euro ISO-8859-15\);\1;' \
                 /etc/locale.gen
 RUN         locale-gen
 
