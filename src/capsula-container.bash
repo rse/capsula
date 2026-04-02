@@ -129,9 +129,9 @@ if ! getent group $grp >/dev/null 2>&1; then
 fi
 if ! getent passwd $usr >/dev/null 2>&1; then
     if [[ $platform == "alpine" ]]; then
-        useradd -M -d $homedir -s $SHELL -u $uid -g $grp $usr >/dev/null 2>&1
+        useradd -M -d "$homedir" -s "$SHELL" -u $uid -g $grp $usr >/dev/null 2>&1
     else
-        useradd -M -d $homedir -s $SHELL -u $uid -g $grp $usr
+        useradd -M -d "$homedir" -s "$SHELL" -u $uid -g $grp $usr
     fi
     if [[ $? -ne 0 ]]; then
         fatal "failed to create user \"$usr\" ($uid)"
@@ -155,7 +155,7 @@ cd "$workdir"
 #   pass-through execution
 if [[ $# -eq 0 ]]; then
     #   enter an interactive shell
-    exec sudo -n "--preserve-env=$preserve" -g "$grp" -u "$usr" $SHELL -i
+    exec sudo -n "--preserve-env=$preserve" -g "$grp" -u "$usr" "$SHELL" -i
 else
     #   execute batch command
     exec sudo -n "--preserve-env=$preserve" -g "$grp" -u "$usr" "$@"
