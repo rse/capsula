@@ -528,14 +528,23 @@ const spool = new Spool()
         stdio:  "inherit",
         reject: false
     })
-    result.on("exit", async (code) => {
+    result.on("exit", async (code, signal) => {
         /*  cleanup resources  */
         await spool.unrollAll()
 
+        /*  determine effective exit code  */
+        let exitCode = code ?? 1
+        if (code === null && signal !== null) {
+            const sigNum = os.constants.signals[signal]
+            if (sigNum !== undefined)
+                exitCode = 128 + sigNum
+        }
+
         /*  terminate gracefully  */
-        if (code !== 0)
-            cli!.log("warning", `encapsulated command terminated with ${chalk.red("error")} exit code ${chalk.red(code)}`)
-        process.exit(code)
+        if (exitCode !== 0)
+            cli!.log("warning", `encapsulated command terminated with ${chalk.red("error")} ` +
+                (signal !== null ? `signal ${chalk.red(signal)}` : `exit code ${chalk.red(exitCode)}`))
+        process.exit(exitCode)
     })
 })().catch(async (err) => {
     /*  cleanup resources and terminate ungracefully  */
