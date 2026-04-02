@@ -100,7 +100,10 @@ USER="$usr";  export USER
 GROUP="$grp"; export GROUP
 
 #   determine list of environment variables to pass-through
-preserve="ENVIRONMENT,PLATFORM,SHELL,USER,GROUP,$(echo "$envvars" | sed -e 's; ;,;g')"
+preserve="ENVIRONMENT,PLATFORM,SHELL,USER,GROUP"
+if [[ -n "$envvars" ]]; then
+    preserve="$preserve,$(echo "$envvars" | sed -e 's; ;,;g')"
+fi
 
 #   provide same user/group as on host
 if ! getent group $grp >/dev/null 2>&1; then
