@@ -620,8 +620,8 @@ const spool = new Spool()
         grp, gid,
         home,
         workdir,
-        mounts.join(" "),
-        binds.join(" "),
+        mounts.map((m) => m.replace(/!$/, "")).join(" "),
+        binds.map((b) => b.replace(/!$/, "")).join(" "),
         envs.join(" "),
         args.sudo ? "yes" : "no",
 

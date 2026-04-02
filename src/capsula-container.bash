@@ -52,11 +52,6 @@ mount --move /etc/capsula-container /mnt/fs-root/etc/capsula-container
 #   remount custom Docker bind mounts for dotfiles
 mkdir -p "/mnt/fs-root$homedir"
 for dotfile in $dotfiles; do
-    ro="true"
-    if [[ $dotfile =~ .*!$ ]]; then
-        ro="false"
-        dotfile="${dotfile%!}"
-    fi
     if [[ -d "/mnt/fs-home$homedir/$dotfile" ]]; then
         mkdir -p "/mnt/fs-root$homedir/$dotfile"
     elif [[ -f "/mnt/fs-home$homedir/$dotfile" ]]; then
@@ -71,11 +66,6 @@ done
 
 #   remount custom Docker bind mounts for external binds
 for bind in $binds; do
-    ro="true"
-    if [[ $bind =~ .*!$ ]]; then
-        ro="false"
-        bind="${bind%!}"
-    fi
     if [[ -d "/mnt/fs-bind$bind" ]]; then
         mkdir -p "/mnt/fs-root$bind"
     elif [[ -f "/mnt/fs-bind$bind" ]]; then
