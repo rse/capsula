@@ -14,6 +14,7 @@ ChangeLog
 - BUGFIX: avoid "unhandled promise rejection" errors on spawning commands
 - BUGFIX: handle errors in spawning commands
 - BUGFIX: fix internal processing of both an environment variable and a CLI option at the same time
+- BUGFIX: avoid unhandled promise rejection errors caused by async callback functions
 - IMPROVEMENT: use a more elaborated version of the internal Spool class
 - IMPROVEMENT: provide more meaningful error messages in case "docker volume inspect" failed
 - UPDATE: upgrade NPM dependencies

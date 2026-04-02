@@ -142,6 +142,18 @@ export class Spool {
     }
 }
 
+/*  helper function for safe async callbacks
+    (avoiding unhandled promise rejection errors)  */
+const safeAsync = <A extends unknown[]>(
+    fn: (...args: A) => Promise<void>
+) => (...args: A): void => {
+    fn(...args).catch((err: unknown) => {
+        const msg = (err instanceof Error ? err.message : String(err))
+        process.stderr.write(`capsula: ERROR: ${msg}\n`)
+        process.exit(1)
+    })
+}
+
 /*  central CLI context  */
 let cli: CLIio | null = null
 
@@ -626,24 +638,24 @@ const spool = new Spool()
             result.kill(signal)
 
             /*  force-kill safety net  */
-            setTimeout(async () => {
+            setTimeout(safeAsync(async () => {
                 result.kill("SIGKILL")
                 await spool.unroll()
                 const sigNum = os.constants.signals[signal]
                 process.exit(128 + (sigNum ?? 0))
-            }, 10 * 1000).unref()
+            }), 10 * 1000).unref()
         })
     }
 
     /*  handle container termination  */
-    result.on("exit", async (code, signal) => {
+    result.on("exit", safeAsync(async (code: number | null, signal: string | null) => {
         /*  cleanup resources  */
         await spool.unroll()
 
         /*  determine effective exit code  */
         let exitCode = code ?? 1
         if (code === null && signal !== null) {
-            const sigNum = os.constants.signals[signal]
+            const sigNum = os.constants.signals[signal as keyof typeof os.constants.signals]
             if (sigNum !== undefined)
                 exitCode = 128 + sigNum
         }
@@ -653,15 +665,15 @@ const spool = new Spool()
             cli!.log("warning", `encapsulated command terminated with ${chalk.red("error")} ` +
                 (signal !== null ? `signal ${chalk.red(signal)}` : `exit code ${chalk.red(exitCode)}`))
         process.exit(exitCode)
-    })
+    }))
 
     /*  handle execution errors  */
-    result.on("error", async (err) => {
+    result.on("error", safeAsync(async (err: Error) => {
         /*  cleanup resources and terminate ungracefully  */
         cli!.log("error", err.message ?? err)
         await spool.unroll()
         process.exit(1)
-    })
+    }))
 
     /*  suppress unhandled promise rejection errors  */
     result.catch(() => {})
