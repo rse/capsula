@@ -9,6 +9,7 @@ ChangeLog
 - BUGFIX: use "deepmerge" for merging configuration
 - BUGFIX: avoid double settlement of internal promise and use "close" event of sub-process
 - BUGFIX: correctly handle the signal case in the "exit" handler of "docker run"
+- BUGFIX: correctly propagate signals to container child process and add force-killsafety net
 - UPDATE: upgrade NPM dependencies
 
 1.2.1 (2026-03-15)

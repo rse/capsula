@@ -528,6 +528,23 @@ const spool = new Spool()
         stdio:  "inherit",
         reject: false
     })
+
+    /*  propagate signals to container child process  */
+    for (const signal of [ "SIGINT", "SIGTERM" ] as const) {
+        process.on(signal, () => {
+            result.kill(signal)
+
+            /*  force-kill safety net  */
+            setTimeout(async () => {
+                result.kill("SIGKILL")
+                await spool.unrollAll()
+                const sigNum = os.constants.signals[signal]
+                process.exit(128 + (sigNum ?? 0))
+            }, 10 * 1000).unref()
+        })
+    }
+
+    /*  handle container termination  */
     result.on("exit", async (code, signal) => {
         /*  cleanup resources  */
         await spool.unrollAll()
