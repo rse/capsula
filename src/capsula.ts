@@ -353,8 +353,13 @@ const spool = new Spool()
                     all:    true,
                     reject: false
                 })
+                if (!response.all) {
+                    reject(new Error("failed to capture combined output stream"))
+                    return
+                }
 
-                /*  support spinner (part 2)  */
+                /*  support spinner (part 2) and handle process termination  */
+                let settled = false
                 response.all.on("data", (chunk: Buffer | string) => {
                     const lines = chunk.toString().split(/\r?\n/)
                     if (spinner !== null) {
@@ -364,27 +369,34 @@ const spool = new Spool()
                             spinnerStarted = true
                         }
                     }
-                    else
+                    else {
                         for (const line of lines)
                             if (line !== "")
                                 cli!.log("debug", `${docker}: | ${line}`)
-                })
-                response.on("exit", (code) => {
-                    if (code === 0) {
-                        if (spinner !== null)
-                            spinner.succeed(`${docker}: SUCCEEDED`)
-                        resolve()
                     }
-                    else {
-                        if (spinner !== null)
-                            spinner.fail(`${docker}: FAILED`)
-                        reject(new Error(`failed with exit code ${code}`))
+                })
+                response.on("close", (code) => {
+                    if (!settled) {
+                        settled = true
+                        if (code === 0) {
+                            if (spinner !== null)
+                                spinner.succeed(`${docker}: SUCCEEDED`)
+                            resolve()
+                        }
+                        else {
+                            if (spinner !== null)
+                                spinner.fail(`${docker}: FAILED`)
+                            reject(new Error(`failed with exit code ${code}`))
+                        }
                     }
                 })
                 response.on("error", (err) => {
-                    if (spinner !== null)
-                        spinner.fail(`${docker}: FAILED: ${err}`)
-                    reject(err)
+                    if (!settled) {
+                        settled = true
+                        if (spinner !== null)
+                            spinner.fail(`${docker}: FAILED: ${err}`)
+                        reject(err)
+                    }
                 })
             })
         })().catch((err: unknown) => {

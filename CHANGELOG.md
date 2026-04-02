@@ -7,6 +7,7 @@ ChangeLog
 
 - CLEANUP: be more precise in description what to install as prequisites
 - BUGFIX: use "deepmerge" for merging configuration
+- BUGFIX: avoid double settlement of internal promise and use "close" event of sub-process
 - UPDATE: upgrade NPM dependencies
 
 1.2.1 (2026-03-15)
