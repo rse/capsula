@@ -104,13 +104,20 @@ preserve="ENVIRONMENT,PLATFORM,SHELL,USER,GROUP,$(echo "$envvars" | sed -e 's; ;
 
 #   provide same user/group as on host
 if ! getent group $grp >/dev/null 2>&1; then
-    groupadd -f -g $gid $grp
+    if ! groupadd -f -g $gid $grp; then
+        echo "capsula: ERROR: failed to create group \"$grp\" ($gid)" 1>&2
+        exit 1
+    fi
 fi
 if ! getent passwd $usr >/dev/null 2>&1; then
     if [[ $platform == "alpine" ]]; then
         useradd -M -d $homedir -s $SHELL -u $uid -g $grp $usr >/dev/null 2>&1
     else
         useradd -M -d $homedir -s $SHELL -u $uid -g $grp $usr
+    fi
+    if [[ $? -ne 0 ]]; then
+        echo "capsula: ERROR: failed to create user \"$usr\" ($uid)" 1>&2
+        exit 1
     fi
 fi
 
