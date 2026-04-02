@@ -1,0 +1,12 @@
+diff --git a/node_modules/neostandard/lib/configs/style.js b/node_modules/neostandard/lib/configs/style.js
+index ec60658..17e9799 100644
+--- a/node_modules/neostandard/lib/configs/style.js
++++ b/node_modules/neostandard/lib/configs/style.js
+@@ -26,7 +26,6 @@ module.exports = /** @satisfies {import('eslint').Linter.Config} */ ({
+     '@stylistic/computed-property-spacing': ['error', 'never', { enforceForClassMembers: true }],
+     '@stylistic/dot-location': ['error', 'property'],
+     '@stylistic/eol-last': 'error',
+-    '@stylistic/func-call-spacing': ['error', 'never'],
+     '@stylistic/generator-star-spacing': ['error', { before: true, after: true }],
+     '@stylistic/indent': ['error', 2, {
+       SwitchCase: 1,

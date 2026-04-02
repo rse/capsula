@@ -14,28 +14,29 @@
         "url":                          "http://engelschall.com"
     },
     "devDependencies": {
-        "eslint":                       "9.39.4",
-        "@eslint/js":                   "9.39.4",
+        "patch-package":                "8.0.1",
+        "eslint":                       "10.1.0",
+        "@eslint/js":                   "10.0.1",
         "eslint-plugin-n":              "17.24.0",
         "eslint-plugin-promise":        "7.2.1",
         "eslint-plugin-import":         "2.32.0",
         "neostandard":                  "0.13.0",
         "globals":                      "17.4.0",
         "shx":                          "0.4.0",
-        "@yao-pkg/pkg":                 "6.14.1",
+        "@yao-pkg/pkg":                 "6.14.2",
         "vite":                         "7.3.1",
-        "vite-plugin-node-polyfills":   "0.25.0",
-        "vite-plugin-static-copy":      "3.3.0",
+        "vite-plugin-node-polyfills":   "0.26.0",
+        "vite-plugin-static-copy":      "4.0.0",
         "@liuli-util/vite-plugin-node": "0.10.0",
         "@wroud/vite-plugin-tsc":       "0.12.2",
         "rollup-plugin-node-externals": "8.1.2",
-        "typescript":                   "5.9.3",
+        "typescript":                   "6.0.2",
         "remark-cli":                   "12.0.1",
         "remark":                       "15.0.1",
         "remark-man":                   "9.0.0",
         "@rse/stx":                     "1.1.4",
         "markdownlint":                 "0.40.0",
-        "markdownlint-cli2":            "0.21.0",
+        "markdownlint-cli2":            "0.22.0",
         "nodemon":                      "3.1.14",
         "check-dependencies":           "2.0.0",
         "chokidar-cli":                 "3.0.0",
@@ -52,18 +53,23 @@
         "execa":                        "9.6.1",
         "which":                        "6.0.1",
         "tmp":                          "0.2.5",
-        "yaml":                         "2.8.2",
+        "yaml":                         "2.8.3",
         "ora":                          "9.3.0",
         "luxon":                        "3.7.2"
     },
     "overrides" : {
-        "@liuli-util/vite-plugin-node": { "vite": ">=6.0.0" }
+        "@liuli-util/vite-plugin-node": { "vite": ">=6.0.0" },
+        "eslint-plugin-promise":        { "eslint": ">=9.0.0" },
+        "eslint-plugin-import":         { "eslint": ">=9.0.0" },
+        "neostandard":                  { "eslint": ">=9.0.0", "@stylistic/eslint-plugin": ">=2.11.0" }
     },
-    "engines" : {
+    "upd":                              [ "!vite" ],
+    "engines": {
         "npm":                          ">=10.0.0",
         "node":                         ">=22.0.0"
     },
     "scripts": {
+        "install":                      "npm start patch-apply",
         "prepublishOnly":               "npm start build",
         "start":                        "stx -v4 -c etc/stx.conf"
     }

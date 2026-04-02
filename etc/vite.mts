@@ -31,6 +31,7 @@ export default Vite.defineConfig(({ command, mode }) => ({
             targets: [{
                 src: [ "src/*.dockerfile", "src/*.bash", "src/*.yaml" ],
                 dest: "../dst-stage1/",
+                rename: { stripBase: 1 },
                 overwrite: true
             }],
             silent: false
