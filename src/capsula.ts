@@ -37,31 +37,108 @@ import rawBash                 from "./capsula-container.bash?raw"              
 import rawDefaults             from "./capsula.yaml?raw"                          with { type: "string" }
 
 /*  helper class for resource spooling  */
-interface SpoolResource<T = unknown> {
+type SpoolCleanup<T = unknown> =
+    (resource: T) => void | Promise<void>
+type SpoolResource<T = unknown> = {
     resource: T,
-    onUnroll: (resource: T) => void | Promise<void>
+    cleanup:  SpoolCleanup<T>
 }
-class Spool {
+export class Spool {
+    /*  internal state  */
     private resources: SpoolResource<unknown>[] = []
-    roll<T> (resource: T, onUnroll: (resource: T) => void | Promise<void>) {
-        this.resources.push({ resource, onUnroll } satisfies SpoolResource<T> as SpoolResource<unknown>)
+    private pending:   Promise<void> | null = null
+
+    /*  roll cleanup procedure onto spool  */
+    roll (cleanup: SpoolCleanup): void
+    roll <T>(resource: T, cleanup: SpoolCleanup<T>): void
+    roll (...args: any[]): void {
+        /*  determine parameters  */
+        let resource: unknown
+        let cleanup:  SpoolCleanup<unknown>
+        if      (args.length === 1) { resource = undefined; cleanup  = args[0] }
+        else if (args.length === 2) { resource = args[0];   cleanup  = args[1] }
+        else
+            throw new Error("invalid number of arguments")
+
+        /*  store information  */
+        this.resources.push({ resource, cleanup })
     }
-    sub () {
+
+    /*  roll a sub-spool onto spool  */
+    sub (): Spool {
+        /*  create new spool  */
         const spool = new Spool()
-        this.roll(spool, async (spool) => { await spool.unrollAll() })
+
+        /*  roll sub-spool onto spool  */
+        this.roll(spool, (s) => s.unroll())
+
+        /*  return new spool  */
         return spool
     }
-    async unroll () {
-        const resource = this.resources.pop()
-        if (resource === undefined)
-            throw new Error("no resource to unroll")
-        const response = resource.onUnroll(resource.resource)
-        if (response instanceof Promise)
-            await response
-    }
-    async unrollAll () {
-        while (this.resources.length > 0)
-            await this.unroll()
+
+    /*  unroll all cleanup procedures from spool  */
+    unroll (suppress = true): Promise<void> | void {
+        /*  guard against concurrent unroll: if an unroll is already
+            in progress, return the existing promise so all callers
+            wait for the same completion  */
+        if (this.pending !== null) {
+            if (suppress)
+                return this.pending.catch(() => {})
+            return this.pending
+        }
+
+        /*  NOTICE: we operate synchronously until the first
+            cleanup procedure returns a Promise. Then we continue
+            asynchronously, regardless of whether the following
+            cleanup procedures return a Promise or not!  */
+        const errors: unknown[] = []
+        let promise: Promise<void> | undefined
+        while (this.resources.length > 0) {
+            const entry    = this.resources.pop()!
+            const resource = entry.resource
+            const cleanup  = entry.cleanup
+            if (promise) {
+                /*  async continuation: isolate each cleanup so one rejection
+                    does not prevent remaining cleanups from executing  */
+                promise = promise.then(() => cleanup(resource))
+                    .catch((err: unknown) => { errors.push(err) })
+            }
+            else {
+                /*  sync start: wrap individually so a throw
+                    does not exit the while loop  */
+                try {
+                    const result = cleanup(resource)
+                    if (result instanceof Promise)
+                        promise = result.catch((err: unknown) => { errors.push(err) })
+                }
+                catch (err: unknown) {
+                    errors.push(err)
+                }
+            }
+        }
+        if (promise) {
+            /*  store the pending promise for concurrent-caller guard  */
+            this.pending = promise.then(() => {
+                if (errors.length === 1)
+                    throw errors[0]
+                else if (errors.length > 1)
+                    throw new AggregateError(errors, "multiple cleanup failures")
+            })
+            this.pending.then(
+                () => { this.pending = null },
+                () => { this.pending = null }
+            )
+            if (suppress)
+                return this.pending.catch(() => {})
+            return this.pending
+        }
+        else {
+            if (!suppress && errors.length === 1)
+                throw errors[0]
+            else if (!suppress && errors.length > 1)
+                throw new AggregateError(errors, "multiple cleanup failures")
+            return
+        }
     }
 }
 
@@ -551,7 +628,7 @@ const spool = new Spool()
             /*  force-kill safety net  */
             setTimeout(async () => {
                 result.kill("SIGKILL")
-                await spool.unrollAll()
+                await spool.unroll()
                 const sigNum = os.constants.signals[signal]
                 process.exit(128 + (sigNum ?? 0))
             }, 10 * 1000).unref()
@@ -561,7 +638,7 @@ const spool = new Spool()
     /*  handle container termination  */
     result.on("exit", async (code, signal) => {
         /*  cleanup resources  */
-        await spool.unrollAll()
+        await spool.unroll()
 
         /*  determine effective exit code  */
         let exitCode = code ?? 1
@@ -582,7 +659,7 @@ const spool = new Spool()
     result.on("error", async (err) => {
         /*  cleanup resources and terminate ungracefully  */
         cli!.log("error", err.message ?? err)
-        await spool.unrollAll()
+        await spool.unroll()
         process.exit(1)
     })
 
@@ -594,7 +671,7 @@ const spool = new Spool()
         cli.log("error", err.message ?? err)
     else
         process.stderr.write(`capsula: ${chalk.red("ERROR")}: ${err.message ?? err} ${err.stack}\n`)
-    await spool.unrollAll()
+    await spool.unroll()
     process.exit(1)
 })
 

@@ -47,6 +47,7 @@ export default [
             "dot-notation":                                       "off",
             "no-labels":                                          "off",
             "no-useless-constructor":                             "off",
+            "no-useless-return":                                  "off",
 
             "@stylistic/indent":                                  [ "error", 4, { SwitchCase: 1 } ],
             "@stylistic/linebreak-style":                         [ "error", "unix" ],

@@ -13,6 +13,7 @@ ChangeLog
 - BUGFIX: make inspection of docker volume more robust
 - BUGFIX: avoid "unhandled promise rejection" errors on spawning commands
 - BUGFIX: handle errors in spawning commands
+- IMPROVEMENT: use a more elaborated version of the internal Spool class
 - UPDATE: upgrade NPM dependencies
 
 1.2.1 (2026-03-15)
