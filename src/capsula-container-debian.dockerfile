@@ -46,7 +46,7 @@ VOLUME      /mnt/fs-volume
 RUN         chmod 777 /mnt/fs-volume
 
 #   cleanup
-RUN         apt-get purge -y --auto-remove && \
+RUN         apt-get autoremove --purge -y && \
             apt-get clean && \
             rm -rf /var/lib/apt/lists/*
 RUN         rm -rf /tmp/* /var/tmp/*
