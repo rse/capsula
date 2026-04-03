@@ -382,9 +382,9 @@ const spool = new Spool()
 
     /*  determine docker(1) compatible tool  */
     const [ haveDocker, havePodman, haveRancher ] = await Promise.all([
-        existsTool("docker")  /*  Docker  */,
-        existsTool("podman")  /*  Podman  */,
-        existsTool("nerdctl") /*  Rancher */
+        existsTool("docker")  /*  Docker   */,
+        existsTool("podman")  /*  Podman   */,
+        existsTool("nerdctl") /*  Rancher  */
     ])
     const docker = (
         args.docker !== "" ? args.docker : (
