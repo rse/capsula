@@ -20,7 +20,7 @@ RUN         dnf upgrade -y
 
 #   install additional tools
 RUN         dnf install -y \
-                dnf-utils ca-certificates lsb-release
+                dnf-utils ca-certificates hostname lsb-release
 
 #   install additional tools
 RUN         dnf install -y --allowerasing \
