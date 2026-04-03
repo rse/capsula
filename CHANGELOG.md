@@ -8,6 +8,7 @@ ChangeLog
 - IMPROVEMENT: add null mount option (-n/--null) to hide sensitive files or directories
 - IMPROVEMENT: fallback to /proc manipulation when hostname(8) is not available
 - IMPROVEMENT: validate environment variable names to ensure they are POSIX conform
+- IMPROVEMENT: support symlinked home and bind mounted directories
 - BUGFIX: ensure that inside the container the same group/gid is used
 - BUGFIX: relocate also existing user if user is already existing in container
 - CLEANUP: update README according to manual page

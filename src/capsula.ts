@@ -620,8 +620,10 @@ let exiting = false
     }
 
     /*  validate working directory (after bind processing)  */
-    const workdirAllowed = workdir === home || workdir.startsWith(`${home}${path.sep}`)
-        || bindDirs.some((bp) => workdir === bp || workdir.startsWith(`${bp}${path.sep}`))
+    const realWorkdir = fs.realpathSync(workdir)
+    const realHome    = fs.realpathSync(home)
+    const workdirAllowed = realWorkdir === realHome || realWorkdir.startsWith(`${realHome}${path.sep}`)
+        || bindDirs.some((bp) => { const rbp = fs.realpathSync(bp); return realWorkdir === rbp || realWorkdir.startsWith(`${rbp}${path.sep}`) })
     if (!workdirAllowed)
         throw new Error(`working directory ${chalk.blue(workdir)} is neither at or below home directory ${chalk.blue(home)} ` +
             "nor at or below any bind-mounted directory")
