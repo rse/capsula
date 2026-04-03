@@ -316,7 +316,7 @@ echo 'alias claude="capsula -c claude /npm/bin/claude"' >~/.dotfiles/bashrc
 **Capsula** provides a special filesystem layout to the encapsulated
 commands with the following distinct design:
 
-1. *Working Directory* (user read/write):
+1. **Working Directory** (user read/write):
    The command is executed in the current working directory
    of the host system. This is achieved by read-write bind mounting
    the directory into the container under the same path as on the host.
@@ -325,7 +325,7 @@ commands with the following distinct design:
    *RATIONALE*: This allows one to execute commands inside the container in
    a mostly identical way as they would be executed on the host.
 
-2. *Parent Paths inside Home Directory* (user read-only):
+2. **Parent Paths inside Home Directory** (user read-only):
    The parent directories of the current working directory
    up to the home directory are empty, except for the
    directories on the path towards the current working
@@ -333,14 +333,14 @@ commands with the following distinct design:
    *RATIONALE*: This shields all potentially private data
    inside the home directory from the executed command.
 
-3. *Home Directory* (user read/write):
+3. **Home Directory** (user read/write):
    The home directory is empty except for the explicitly
    configured paths (usually dotfiles) and the working
    directory.
    *RATIONALE*: This allows one to run the command inside the container
    with the same configuration as it is available on the host.
 
-4. *External Bind Mounts* (user read-only or read-write):
+4. **External Bind Mounts** (user read-only or read-write):
    Arbitrary directories or files outside the home directory can be bind-mounted
    into the container with their original paths preserved.
    By default, external bind mounts are read-only. Appending `!` to
@@ -349,7 +349,7 @@ commands with the following distinct design:
    external data directories (e.g., `/data/projects`, `/opt/tools`)
    without granting access to the entire host filesystem.
 
-5. *Parent Paths inside Root Directory* (root read/write):
+5. **Parent Paths inside Root Directory** (root read/write):
    The parent directories of the home directory
    up to the root directory are exactly those as provided by the
    Linux container operating system, but changes are
@@ -358,7 +358,7 @@ commands with the following distinct design:
    into the container in an arbitrary way without having
    to build a custom container image.
 
-6. *Null Mounts* (hidden):
+6. **Null Mounts** (hidden):
    Specific files or directories can be null-mounted (hidden) inside the
    container. Files are hidden by bind-mounting `/dev/null` over them,
    directories by mounting an empty `tmpfs`. Null mounts are applied after
@@ -370,37 +370,36 @@ commands with the following distinct design:
 
 ## INTERNALS
 
-**Capsula** achieves the above filesystem layout with the following
-way of manipulating the filesystem structure:
+**Capsula** achieves the above **DESIGN** and corresponding filesystem
+layout with the following way of manipulating the filesystem structure:
 
-1. *PASS 1: CONTAINER OVERLAY*:
+1. **PASS 1: CONTAINER OVERLAY**:
    The entire container image filesystem is shadowed with an overlayed
    filesystem, staying in the volume *volume-name*, as specified by
    option `-V`/`--volume`. This keeps the container image sane and
    still allows changes to the Linux operating system, even across
-   multiple container starts. Additionally, it will receive
-   all changes outside the working directory, and hence especially
-   provide the empty space around the home directory and around
-   the working directory. In order to get rid of all changes stored
-   in the volume, the volume can be removed with `docker volume rm
-   `*volume-name*.
+   multiple container starts. Additionally, it will receive all changes
+   outside the working directory, and hence especially provide the empty
+   space around the home directory, around the working directory and
+   around the bind mounts. In order to get rid of all changes stored
+   in the volume, the volume has to be removed with `docker volume rm
+   `*volume-name* manually when wished.
 
-2. *PASS 2: STANDARD CONTAINER PATHS*:
-   Standard Linux filesystems `/proc`, `/sys`, and `/dev`,
-   Docker's own bind mounts for files `/etc/resolv.conf`,
+2. **PASS 2: STANDARD CONTAINER PATHS**:
+   The standard Linux filesystems `/proc`, `/sys`, and `/dev`,
+   Docker's own bind mounts for the files `/etc/resolv.conf`,
    `/etc/hostname`, and `/etc/hosts`, **Capsula**'s own startup script
-   `/etc/capsula-container`, all **Capsula** bind mounts (option
-   `-b`/`--bind`) are moved from below to above the overlay
-   filesystem to not be shadowed.
+   `/etc/capsula-container` are overlayed.
 
-3. *PASS 3: HOST INCLUSION PATHS*:
+3. **PASS 3: HOST INCLUSION PATHS**:
    From the host environment, the current working directory (usually
    at or below either the home directory or one of the bind mounts),
    the relevant dotfiles in the home directory (`$HOME/.foo`), and the
    optional bind mounts are overlayed.
 
-4. *PASS 4: HOST EXCLUSION PATHS*:
-   The optional null mounts are overlayed to shadow sensitive files or
+4. **PASS 4: HOST EXCLUSION PATHS**:
+   The optional null mounts are overlayed as `tmpfs` directories or
+   `/dev/null` bound files to selectively shadow sensitive files or
    directories from the host environment.
 
 ## SEE ALSO
