@@ -153,6 +153,18 @@ if ! getent group "$grp" >/dev/null 2>&1; then
     if ! groupadd -f -g "$gid" "$grp"; then
         fatal "failed to create group \"$grp\" ($gid)"
     fi
+elif [[ "$(getent group "$grp" | cut -d: -f3)" != "$gid" ]]; then
+    grp_exists=$(getent group "$gid" 2>/dev/null | cut -d: -f1)
+    if [[ -n "$grp_exists" ]]; then
+        #   free up the target group id if it is occupied by an existing group
+        gid_free=$(awk -F: '{ if ($3 > max) max = $3 } END { print max + 1 }' /etc/group)
+        if ! groupmod -g "$gid_free" "$grp_exists"; then
+            fatal "failed to move group \"$grp_exists\" to \"$gid_free\""
+        fi
+    fi
+    if ! groupmod -g "$gid" "$grp"; then
+        fatal "failed to modify group \"$grp\" ($gid)"
+    fi
 fi
 if ! getent passwd "$usr" >/dev/null 2>&1; then
     if [[ "$platform" == "alpine" ]]; then
