@@ -474,8 +474,12 @@ let exiting = false
                 let settled = false
                 response.all.on("data", (chunk: Buffer | string) => {
                     const lines = chunk.toString().split(/\r?\n/)
+                        .filter((line) => line !== "")
                     if (spinner !== null) {
-                        spinner.text = `${docker}: | ${lines[0]}`
+                        if (lines.length > 0)
+                            spinner.text = `${docker}: | ${lines[lines.length - 1]}`
+                        else
+                            spinner.text = `${docker}: | `
                         if (!spinnerStarted) {
                             spinner.start()
                             spinnerStarted = true
