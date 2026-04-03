@@ -559,6 +559,9 @@ const spool = new Spool()
     for (const env of envs)
         opts.push("-e", env)
     envs = envs.map((env) => env.replace(/^([^=]+)=.*$/, "$1"))
+    for (const env of envs)
+        if (!env.match(/^[A-Za-z_][A-Za-z0-9_]*$/))
+            throw new Error(`invalid environment variable name ${chalk.blue(env)}`)
 
     /*  determine dotfile mounts to expose  */
     const mounts: string[] = mergeList(config[args.context]?.mount ?? config.default?.mount ?? [], args.mount)
