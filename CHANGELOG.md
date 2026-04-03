@@ -2,7 +2,7 @@
 ChangeLog
 =========
 
-1.2.2 (2026-03-15)
+1.3.0 (2026-04-03)
 ------------------
 
 - IMPROVEMENT: use a more elaborated version of the internal Spool class
