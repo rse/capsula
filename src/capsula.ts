@@ -677,9 +677,23 @@ let exiting = false
         reject: false
     })
 
+    /*  centralized shutdown procedure (idempotent)  */
+    let forceKillTimer: ReturnType<typeof setTimeout> | null = null
+    const shutdown = async (exitCode: number) => {
+        /*  cancel pending force-kill timer and claim exit  */
+        if (forceKillTimer !== null)
+            clearTimeout(forceKillTimer)
+        if (exiting)
+            return
+        exiting = true
+
+        /*  cleanup resources and terminate  */
+        await spool.unroll()
+        process.exit(exitCode)
+    }
+
     /*  propagate signals to container child process  */
     let forceKillScheduled = false
-    let forceKillTimer: ReturnType<typeof setTimeout> | null = null
     for (const signal of [ "SIGINT", "SIGTERM" ] as const) {
         process.on(signal, () => {
             result.kill(signal)
@@ -688,13 +702,8 @@ let exiting = false
             if (!forceKillScheduled) {
                 forceKillScheduled = true
                 forceKillTimer = setTimeout(safeAsync(async () => {
-                    if (exiting)
-                        return
-                    exiting = true
                     result.kill("SIGKILL")
-                    await spool.unroll()
-                    const sigNum = os.constants.signals[signal]
-                    process.exit(128 + (sigNum ?? 0))
+                    await shutdown(128 + (os.constants.signals[signal] ?? 0))
                 }), 10 * 1000)
                 forceKillTimer.unref()
             }
@@ -703,16 +712,6 @@ let exiting = false
 
     /*  handle container termination  */
     result.on("exit", safeAsync(async (code: number | null, signal: string | null) => {
-        /*  cancel pending force-kill timer and claim exit  */
-        if (forceKillTimer !== null)
-            clearTimeout(forceKillTimer)
-        if (exiting)
-            return
-        exiting = true
-
-        /*  cleanup resources  */
-        await spool.unroll()
-
         /*  determine effective exit code  */
         let exitCode = code ?? 1
         if (code === null && signal !== null) {
@@ -721,26 +720,18 @@ let exiting = false
                 exitCode = 128 + sigNum
         }
 
-        /*  terminate gracefully  */
+        /*  log warning and shutdown  */
         if (exitCode !== 0)
             cli!.log("warning", `encapsulated command terminated with ${chalk.red("error")} ` +
                 (signal !== null ? `signal ${chalk.red(signal)}` : `exit code ${chalk.red(exitCode)}`))
-        process.exit(exitCode)
+        await shutdown(exitCode)
     }))
 
     /*  handle execution errors  */
     result.on("error", safeAsync(async (err: Error) => {
-        /*  cancel pending force-kill timer and claim exit  */
-        if (forceKillTimer !== null)
-            clearTimeout(forceKillTimer)
-        if (exiting)
-            return
-        exiting = true
-
-        /*  cleanup resources and terminate ungracefully  */
+        /*  log error and shutdown  */
         cli!.log("error", err.message ?? err)
-        await spool.unroll()
-        process.exit(1)
+        await shutdown(1)
     }))
 
     /*  suppress unhandled promise rejection errors  */
