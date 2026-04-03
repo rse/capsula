@@ -463,7 +463,7 @@ const spool = new Spool()
                                 cli!.log("debug", `${docker}: | ${line}`)
                     }
                 })
-                response.on("close", (code) => {
+                response.on("close", (code, signal) => {
                     if (!settled) {
                         settled = true
                         if (code === 0) {
@@ -474,7 +474,10 @@ const spool = new Spool()
                         else {
                             if (spinner !== null)
                                 spinner.fail(`${docker}: FAILED`)
-                            reject(new Error(`failed with exit code ${code}`))
+                            if (signal !== null)
+                                reject(new Error(`failed with signal ${signal}`))
+                            else
+                                reject(new Error(`failed with exit code ${code}`))
                         }
                     }
                 })
