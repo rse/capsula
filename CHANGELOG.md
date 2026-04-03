@@ -2,6 +2,11 @@
 ChangeLog
 =========
 
+1.3.1 (2026-04-03)
+------------------
+
+- CLEANUP: update README according to manual page
+
 1.3.0 (2026-04-03)
 ------------------
 
