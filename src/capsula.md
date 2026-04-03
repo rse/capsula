@@ -164,7 +164,7 @@ default:
         - .cache!
     bind: []
     port:
-        - 8888
+        - "8888"
 ```
 
 An overriding custom configuration file can be given with option `-f`/`--config`.
