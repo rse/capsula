@@ -6,6 +6,7 @@ ChangeLog
 ------------------
 
 - IMPROVEMENT: add Void Linux distribution support
+- BUGFIX: do not pass invalid bind-mounts to container startup script
 
 1.3.2 (2026-04-03)
 ------------------

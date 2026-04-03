@@ -583,6 +583,7 @@ let exiting = false
 
     /*  determine dotfile mounts to expose  */
     const mounts: string[] = mergeList(config[args.context]?.mount ?? config.default?.mount ?? [], args.mount)
+    const mountsEffective: string[] = []
     for (let mount of mounts) {
         let ro = true
         if (mount.endsWith("!")) {
@@ -596,6 +597,7 @@ let exiting = false
             continue
         }
         const mountOption = ro ? ":ro" : ""
+        mountsEffective.push(mount)
         opts.push("-v", `${mountPath}:/mnt/fs-home${mountPath}${mountOption}`)
     }
 
@@ -690,8 +692,8 @@ let exiting = false
         grp, gid,
         home,
         workdir,
-        String(mounts.length),
-        ...mounts.map((m) => m.replace(/!$/, "")),
+        String(mountsEffective.length),
+        ...mountsEffective,
         String(binds.length),
         ...binds.map((b) => b.replace(/!$/, "")),
         String(nulls.length),
