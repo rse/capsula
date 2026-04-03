@@ -18,6 +18,7 @@ import { hideBin }             from "yargs/helpers"
 import { execa, type Options } from "execa"
 import chalk                   from "chalk"
 import which                   from "which"
+import { quote }               from "shell-quote"
 import tmp                     from "tmp"
 import jsYAML                  from "yaml"
 import Ora                     from "ora"
@@ -317,7 +318,7 @@ const spool = new Spool()
 
     /*  helper function wrapping execa()  */
     const exec = <T extends Options>(cmd: string, cmdArgs: string[], opts: T) => {
-        const str = [ cmd, ...cmdArgs ].map((x) => x.match(/\s/) ? `'${x.replace(/'/g, "'\\''")}'` : x).join(" ")
+        const str = quote([ cmd, ...cmdArgs ])
         const options: string[] = []
         if (opts.cwd)
             options.push(`cwd: ${chalk.blue(opts.cwd)}`)

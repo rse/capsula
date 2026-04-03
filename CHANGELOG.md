@@ -24,6 +24,7 @@ ChangeLog
 - BUGFIX: allow the user to stay in the home directory as the working directory, too
 - BUGFIX: fix Debian and Ubuntu cleanup procedures
 - BUGFIX: ensure that even batch commands get the Bash shell profile loaded
+- BUGFIX: provide correct shell quoting in debug logging
 - CLEANUP: activate more locales also in Arch container
 - CLEANUP: add error handling to the container startup script
 - CLEANUP: be more precise in description what to install as prequisites
