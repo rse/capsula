@@ -36,7 +36,9 @@ envvars="$1";  shift
 sudo="$1";     shift
 
 #   implicitly change hostname
-if [[ ! "$hostname" =~ ^[a-zA-Z0-9._-]+$ ]]; then
+if [[ ! "$hostname" =~ ^[a-zA-Z0-9]([a-zA-Z0-9._-]*[a-zA-Z0-9])?$ ]] \
+    || [[ "$hostname" =~ \.\. ]] \
+    || [[ ${#hostname} -gt 253 ]]; then
     fatal "invalid hostname format"
 fi
 echo "127.0.0.1 $hostname" >>/etc/hosts
