@@ -176,12 +176,13 @@ if ! getent passwd "$usr" >/dev/null 2>&1; then
         fi
     fi
     if [[ "$platform" == "alpine" ]]; then
-        useradd -M -d "$homedir" -s "$SHELL" -u "$uid" -g "$grp" "$usr" >/dev/null 2>&1
+        if ! useradd -M -d "$homedir" -s "$SHELL" -u "$uid" -g "$grp" "$usr" >/dev/null 2>&1; then
+            fatal "failed to create user \"$usr\" ($uid)"
+        fi
     else
-        useradd -M -d "$homedir" -s "$SHELL" -u "$uid" -g "$grp" "$usr"
-    fi
-    if [[ $? -ne 0 ]]; then
-        fatal "failed to create user \"$usr\" ($uid)"
+        if ! useradd -M -d "$homedir" -s "$SHELL" -u "$uid" -g "$grp" "$usr"; then
+            fatal "failed to create user \"$usr\" ($uid)"
+        fi
     fi
 elif [[ "$(getent passwd "$usr" | cut -d: -f3)" != "$uid" ]]; then
     usr_exists=$(getent passwd "$uid" 2>/dev/null | cut -d: -f1)
