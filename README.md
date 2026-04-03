@@ -129,7 +129,7 @@ The particular command-line options and arguments are:
   from the *context* given by the specified *config* or the default.
 
 - \[`-b`|`--bind` *path*\]:
-  Bind-mount an external directory into the container.
+  Bind-mount an external directory or file into the container.
   The *path* argument has to be an absolute pathname.
   The bind mount is read-only by default. Appending `!` to the *path* makes it read-write.
   This option can be given multiple times.
@@ -369,7 +369,7 @@ commands with the following distinct design:
    with the same configuration as it is available on the host.
 
 4. *External Bind Mounts* (user read-only or read-write):
-   Arbitrary directories outside the home directory can be bind-mounted
+   Arbitrary directories or files outside the home directory can be bind-mounted
    into the container with their original paths preserved.
    By default, external bind mounts are read-only. Appending `!` to
    the path makes them read-write.

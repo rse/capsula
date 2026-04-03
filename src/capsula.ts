@@ -584,7 +584,7 @@ let exiting = false
 
     /*  determine external bind mounts to expose  */
     const binds: string[] = mergeList(config[args.context]?.bind ?? config.default?.bind ?? [], args.bind)
-    const bindPaths: string[] = []
+    const bindDirs: string[] = []
     for (let bind of binds) {
         let ro = true
         if (bind.endsWith("!")) {
@@ -593,14 +593,18 @@ let exiting = false
         }
         if (!path.isAbsolute(bind))
             throw new Error(`bind path ${chalk.blue(bind)} has to be an absolute path`)
-        bindPaths.push(bind)
+        const stat = fs.statSync(bind, { throwIfNoEntry: false })
+        if (stat === undefined || (!stat.isDirectory() && !stat.isFile()))
+            throw new Error(`bind path ${chalk.blue(bind)} does not exist`)
+        if (stat.isDirectory())
+            bindDirs.push(bind)
         const bindOption = ro ? ":ro" : ""
         opts.push("-v", `${bind}:/mnt/fs-bind${bind}${bindOption}`)
     }
 
     /*  validate working directory (after bind processing)  */
     const workdirAllowed = workdir === home || workdir.startsWith(`${home}${path.sep}`)
-        || bindPaths.some((bp) => workdir === bp || workdir.startsWith(`${bp}${path.sep}`))
+        || bindDirs.some((bp) => workdir === bp || workdir.startsWith(`${bp}${path.sep}`))
     if (!workdirAllowed)
         throw new Error(`working directory ${chalk.blue(workdir)} is neither at or below home directory ${chalk.blue(home)} ` +
             "nor at or below any bind-mounted directory")
