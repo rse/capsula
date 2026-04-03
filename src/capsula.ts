@@ -529,16 +529,9 @@ let exiting = false
     }
 
     /*  create capsula volume  */
-    const volumeInspect = await exec(docker, [ "volume", "inspect", nameVolume ],
-        { stdio: [ "ignore", "ignore", "pipe" ], reject: false })
-    let volumeExists: boolean
-    if (volumeInspect.exitCode === 0)
-        volumeExists = true
-    else if (/no such volume|volume not found|no volume/i.test(volumeInspect.stderr))
-        volumeExists = false
-    else
-        throw new Error("failed to inspect persistent volume: " +
-            ((volumeInspect.stderr !== "" ? volumeInspect.stderr : null) ?? `unknown reason (exit code: ${volumeInspect.exitCode})`))
+    const volumeList = await exec(docker, [ "volume", "ls", "--filter", `name=${nameVolume}`, "--format", "{{.Name}}" ],
+        { stdio: [ "ignore", "pipe", "ignore" ], reject: false })
+    const volumeExists = volumeList.stdout.trim().split("\n").includes(nameVolume)
     if (!volumeExists) {
         cli.log("info", `creating persistent volume ${chalk.blue(nameVolume)}`)
         await exec(docker, [ "volume", "create", nameVolume ], { stdio: "ignore" })
