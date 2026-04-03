@@ -5,18 +5,15 @@
 ##  Licensed under MIT <https://spdx.org/licenses/MIT>
 ##
 
-#   fatal error utility
-fatal () { echo "capsula: ERROR: $1" 1>&2; exit 1; }
-
 #   take over parameters
 distro="$1"; shift
 hostname="$1"; shift
-usr="$1";      shift
-uid="$1";      shift
-grp="$1";      shift
-gid="$1";      shift
-homedir="$1";  shift
-workdir="$1";  shift
+usr="$1"; shift
+uid="$1"; shift
+grp="$1"; shift
+gid="$1"; shift
+homedir="$1"; shift
+workdir="$1"; shift
 dotfiles_count="$1"; shift
 dotfiles=()
 for ((i = 0; i < dotfiles_count; i++)); do
@@ -32,8 +29,11 @@ nulls=()
 for ((i = 0; i < nulls_count; i++)); do
     nulls+=("$1"); shift
 done
-envvars="$1";  shift
-sudo="$1";     shift
+envvars="$1"; shift
+sudo="$1"; shift
+
+#   fatal error utility
+fatal () { echo "capsula: ERROR: $1" 1>&2; exit 1; }
 
 #   implicitly change hostname
 if [[ ! "$hostname" =~ ^[a-zA-Z0-9]([a-zA-Z0-9._-]*[a-zA-Z0-9])?$ ]] \
