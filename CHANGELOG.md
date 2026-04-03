@@ -7,6 +7,7 @@ ChangeLog
 
 - IMPROVEMENT: use a more elaborated version of the internal Spool class
 - IMPROVEMENT: provide more meaningful error messages in case "docker volume inspect" failed
+- IMPROVEMENT: support full "docker run -p" port-specification in "capsula -p"
 - BUGFIX: use "deepmerge" for merging configuration
 - BUGFIX: avoid double settlement of internal promise and use "close" event of sub-process
 - BUGFIX: correctly handle the signal case in the "exit" handler of "docker run"

@@ -15,7 +15,7 @@
 \[`-e`|`--env` *variable*\[`=`*value*\]\]
 \[`-m`|`--mount` *dotfile*\]
 \[`-b`|`--bind` *path*\]
-\[`-p`|`--port` *port*\]
+\[`-p`|`--port` *port-spec*\]
 \[`-I`|`--image` *image-name*\]
 \[`-C`|`--container` *container-name*\]
 \[`-V`|`--volume` *volume-name*\]
@@ -91,10 +91,17 @@ The following command-line options and arguments exist to the `capsula(1)` comma
   bind mounts from the *context* given by the specified *config* or the
   default.
 
-- \[`-p`|`--port` *port*\]:
+- \[`-p`|`--port` *port-spec*\]:
   Map port for encapsulated command.
+  The *port-spec* can be a plain port number (e.g., `8080`),
+  a *host-port*`:`*container-port* pair (e.g., `8080:9090`),
+  an *ip*`:`*host-port*`:`*container-port* triple (e.g., `127.0.0.1:8080:9090`
+  or `[::1]:8080:9090` for IPv6),
+  or any of these with a `/tcp` or `/udp` protocol suffix (e.g., `8080/udp`).
+  A plain port number is mapped identically on both host and container side.
+  Port numbers must be in the range 1-65535.
   This option can be given multiple times.
-  Passing `!` as *port* resets the ports
+  Passing `!` as *port-spec* resets the ports
   from the *context* given by the specified *config* or the default.
 
 - \[`-I`|`--image` *image-name*\]:

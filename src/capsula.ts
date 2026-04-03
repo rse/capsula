@@ -589,8 +589,21 @@ const spool = new Spool()
 
     /*  determine ports to expose  */
     const ports: string[] = mergeList(config[args.context]?.port ?? config.default?.port ?? [], args.port)
-    for (const port of ports)
-        opts.push("-p", `${port}:${port}`)
+    for (const port of ports) {
+        const m = port.match(/^(?:(\[[A-Fa-f0-9.:]+\]|[A-Fa-f0-9.]+):)?(?:(\d+):)?(\d+)(\/(?:tcp|udp))?$/)
+        if (!m)
+            throw new Error(`invalid port specification ${chalk.blue(port)}`)
+        const portNums = [ m[2], m[3] ].filter((p) => p !== undefined).map((p) => parseInt(p, 10))
+        for (const num of portNums) {
+            if (num < 1 || num > 65535)
+                throw new Error(`port number ${chalk.blue(String(num))} in port specification ` +
+                    `${chalk.blue(port)} is out of valid range 1-65535`)
+        }
+        if (port.includes(":"))
+            opts.push("-p", port)
+        else
+            opts.push("-p", `${port}:${port}`)
+    }
 
     /*  create local copies of entrypoint script  */
     const subSpool = spool.sub()
