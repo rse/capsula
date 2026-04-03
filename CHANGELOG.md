@@ -7,6 +7,7 @@ ChangeLog
 
 - IMPROVEMENT: add null mount option (-n/--null) to hide sensitive files or directories
 - BUGFIX: ensure that inside the container the same group/gid is used
+- BUGFIX: relocate also existing user if user is already existing in container
 - CLEANUP: update README according to manual page
 
 1.3.0 (2026-04-03)

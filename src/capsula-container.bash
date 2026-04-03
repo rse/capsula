@@ -167,6 +167,14 @@ elif [[ "$(getent group "$grp" | cut -d: -f3)" != "$gid" ]]; then
     fi
 fi
 if ! getent passwd "$usr" >/dev/null 2>&1; then
+    usr_exists=$(getent passwd "$uid" 2>/dev/null | cut -d: -f1)
+    if [[ -n "$usr_exists" ]]; then
+        #   free up the target user id if it is occupied by an existing user
+        uid_free=$(awk -F: '{ if ($3 > max) max = $3 } END { print max + 1 }' /etc/passwd)
+        if ! usermod -u "$uid_free" "$usr_exists"; then
+            fatal "failed to move user \"$usr_exists\" to \"$uid_free\""
+        fi
+    fi
     if [[ "$platform" == "alpine" ]]; then
         useradd -M -d "$homedir" -s "$SHELL" -u "$uid" -g "$grp" "$usr" >/dev/null 2>&1
     else
@@ -174,6 +182,18 @@ if ! getent passwd "$usr" >/dev/null 2>&1; then
     fi
     if [[ $? -ne 0 ]]; then
         fatal "failed to create user \"$usr\" ($uid)"
+    fi
+elif [[ "$(getent passwd "$usr" | cut -d: -f3)" != "$uid" ]]; then
+    usr_exists=$(getent passwd "$uid" 2>/dev/null | cut -d: -f1)
+    if [[ -n "$usr_exists" ]]; then
+        #   free up the target user id if it is occupied by an existing user
+        uid_free=$(awk -F: '{ if ($3 > max) max = $3 } END { print max + 1 }' /etc/passwd)
+        if ! usermod -u "$uid_free" "$usr_exists"; then
+            fatal "failed to move user \"$usr_exists\" to \"$uid_free\""
+        fi
+    fi
+    if ! usermod -u "$uid" "$usr"; then
+        fatal "failed to modify user \"$usr\" ($uid)"
     fi
 fi
 
