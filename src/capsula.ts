@@ -667,7 +667,7 @@ let exiting = false
         ...binds.map((b) => b.replace(/!$/, "")),
         String(nulls.length),
         ...nulls,
-        envs.join(" "),
+        envs.map((e) => e.replace(/=.*$/, "")).join(" "),
         args.sudo ? "yes" : "no",
 
         /*  command to execute  */
