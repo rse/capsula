@@ -578,6 +578,11 @@ let exiting = false
             mount = mount.replace(/!$/, "")
         }
         const mountPath = path.join(home, mount)
+        const stat = fs.statSync(mountPath, { throwIfNoEntry: false })
+        if (stat === undefined) {
+            cli!.log("warning", `mount dot-path ${chalk.blue(mount)} does not exist -- skipping`)
+            continue
+        }
         const mountOption = ro ? ":ro" : ""
         opts.push("-v", `${mountPath}:/mnt/fs-home${mountPath}${mountOption}`)
     }
