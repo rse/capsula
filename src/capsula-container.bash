@@ -158,6 +158,10 @@ if [[ $# -eq 0 ]]; then
     exec sudo -n "--preserve-env=$preserve" -g "$grp" -u "$usr" "$SHELL" -i
 else
     #   execute batch command
-    exec sudo -n "--preserve-env=$preserve" -g "$grp" -u "$usr" "$@"
+    cmd=""
+    for arg in "$@"; do
+        cmd="$cmd $(printf '%q' "$arg")"
+    done
+    exec sudo -n "--preserve-env=$preserve" -g "$grp" -u "$usr" "$SHELL" -l -c "exec $cmd"
 fi
 
