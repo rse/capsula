@@ -115,11 +115,17 @@ for nullpath in "${nulls[@]}"; do
         nullpath="$workdir/$nullpath"
     fi
     if [[ -d "$nullpath" ]]; then
-        mount -t tmpfs -o size=0 tmpfs "$nullpath" \
+        nullmode=$(stat -c "%a" "$nullpath" 2>/dev/null)
+        mount -t tmpfs -o "size=0,mode=${nullmode:-0755},uid=$uid,gid=$gid" tmpfs "$nullpath" \
             || fatal "failed to null-mount directory \"$nullpath\""
     elif [[ -f "$nullpath" ]]; then
-        mount --bind /dev/null "$nullpath" \
+        nullmode=$(stat -c "%a" "$nullpath" 2>/dev/null)
+        nullfile=$(mktemp /tmp/capsula-null.XXXXXX)
+        chmod "${nullmode:-0644}" "$nullfile"
+        chown "$uid:$gid" "$nullfile"
+        mount --bind "$nullfile" "$nullpath" \
             || fatal "failed to null-mount file \"$nullpath\""
+        rm -f "$nullfile"
     else
         echo "capsula: WARNING: null-path \"$nullpath\" neither directory nor file -- skipping" 1>&2
     fi
