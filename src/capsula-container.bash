@@ -27,6 +27,11 @@ binds=()
 for ((i = 0; i < binds_count; i++)); do
     binds+=("$1"); shift
 done
+nulls_count="$1"; shift
+nulls=()
+for ((i = 0; i < nulls_count; i++)); do
+    nulls+=("$1"); shift
+done
 envvars="$1";  shift
 sudo="$1";     shift
 
@@ -103,6 +108,22 @@ pivot_root . fs-root-old \
     || fatal "failed to pivot root filesystem"
 umount -l /fs-root-old \
     || fatal "failed to unmount old root filesystem"
+
+#   null-mount (hide) specified files and directories
+for nullpath in "${nulls[@]}"; do
+    if [[ "$nullpath" != /* ]]; then
+        nullpath="$workdir/$nullpath"
+    fi
+    if [[ -d "$nullpath" ]]; then
+        mount -t tmpfs -o size=0 tmpfs "$nullpath" \
+            || fatal "failed to null-mount directory \"$nullpath\""
+    elif [[ -f "$nullpath" ]]; then
+        mount --bind /dev/null "$nullpath" \
+            || fatal "failed to null-mount file \"$nullpath\""
+    else
+        echo "capsula: WARNING: null-path \"$nullpath\" neither directory nor file -- skipping" 1>&2
+    fi
+done
 
 #   provide hint about environment and platform
 ENVIRONMENT="capsula"; export ENVIRONMENT

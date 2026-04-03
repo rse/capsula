@@ -20,6 +20,7 @@ default:
         - .npmrc
         - .cache!
     bind: []
+    null: []
     port:
         - 8888
 

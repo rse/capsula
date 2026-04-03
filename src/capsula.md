@@ -15,6 +15,7 @@
 \[`-e`|`--env` *variable*\[`=`*value*\]\]
 \[`-m`|`--mount` *dotfile*\]
 \[`-b`|`--bind` *path*\]
+\[`-n`|`--null` *path*\]
 \[`-p`|`--port` *port-spec*\]
 \[`-I`|`--image` *image-name*\]
 \[`-C`|`--container` *container-name*\]
@@ -91,6 +92,18 @@ The following command-line options and arguments exist to the `capsula(1)` comma
   bind mounts from the *context* given by the specified *config* or the
   default.
 
+- \[`-n`|`--null` *path*\]:
+  Null-mount (hide) a file or directory inside the container.
+  If *path* starts with `/`, it is treated as an absolute pathname;
+  otherwise it is treated as relative to the current working directory.
+  For files, `/dev/null` is bind-mounted over the target, making it
+  appear empty. For directories, an empty `tmpfs` is mounted over the target,
+  making it appear empty. This is useful for hiding sensitive files
+  (e.g., `.env`, credential files) that exist within mounted dotfiles
+  or bind-mounted directories. This option can be given multiple times.
+  Passing `!` as *path* resets the null mounts from the *context*
+  given by the specified *config* or the default.
+
 - \[`-p`|`--port` *port-spec*\]:
   Map port for encapsulated command.
   The *port-spec* can be a plain port number (e.g., `8080`),
@@ -163,6 +176,7 @@ default:
         - .npmrc
         - .cache!
     bind: []
+    null: []
     port:
         - "8888"
 ```
@@ -171,6 +185,7 @@ An overriding custom configuration file can be given with option `-f`/`--config`
 Option `-e`/`--env` can be used to override the section `env`.
 Option `-m`/`--mount` can be used to override the section `mount`.
 Option `-b`/`--bind` can be used to override the section `bind`.
+Option `-n`/`--null` can be used to override the section `null`.
 Option `-p`/`--port` can be used to override the section `port`.
 
 ## ENVIRONMENT
@@ -215,6 +230,11 @@ default values for the corresponding command-line options:
 
 - `CAPSULA_BIND`:
   Default value for option `-b`/`--bind`.
+  Multiple values can be separated by whitespace or comma.
+  If not set, defaults to an empty list.
+
+- `CAPSULA_NULL`:
+  Default value for option `-n`/`--null`.
   Multiple values can be separated by whitespace or comma.
   If not set, defaults to an empty list.
 
@@ -317,6 +337,16 @@ commands with the following distinct design:
    *RATIONALE*: This allows one to permanently install tools (as `root` via `sudo`(8))
    into the container in an arbitrary way without having
    to build a custom container image.
+
+6. *Null Mounts* (hidden):
+   Specific files or directories can be null-mounted (hidden) inside the
+   container. Files are hidden by bind-mounting `/dev/null` over them,
+   directories by mounting an empty `tmpfs`. Null mounts are applied after
+   all other mounts are in place.
+   *RATIONALE*: This allows one to hide sensitive files like `.env` or
+   credential files that might be present in mounted dotfiles or
+   bind-mounted directories, preventing the encapsulated command
+   from accessing them.
 
 ## SEE ALSO
 

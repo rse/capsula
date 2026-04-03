@@ -5,6 +5,7 @@ ChangeLog
 1.3.1 (2026-04-03)
 ------------------
 
+- IMPROVEMENT: add null mount option (-n/--null) to hide sensitive files or directories
 - CLEANUP: update README according to manual page
 
 1.3.0 (2026-04-03)

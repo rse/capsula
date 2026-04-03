@@ -183,6 +183,7 @@ const spool = new Spool()
             "[-e|--env <variable>[=<value>]]",
             "[-m|--mount <dotfile>]",
             "[-b|--bind <path>]",
+            "[-n|--null <path>]",
             "[-p|--port <port>]",
             "[-I|--image <image-name>]",
             "[-C|--container <container-name>]",
@@ -263,6 +264,13 @@ const spool = new Spool()
             coerce:   coerceA<string>,
             default:  process.env.CAPSULA_BIND ? process.env.CAPSULA_BIND.split(/[\s,]+/) : [],
             describe: "bind-mount external directory into container"
+        })
+        .option("null", {
+            alias:    "n",
+            type:     "string",
+            coerce:   coerceA<string>,
+            default:  process.env.CAPSULA_NULL ? process.env.CAPSULA_NULL.split(/[\s,]+/) : [],
+            describe: "null-mount (hide) file or directory in container"
         })
         .option("port", {
             alias:    "p",
@@ -565,6 +573,9 @@ const spool = new Spool()
         opts.push("-v", `${mountPath}:/mnt/fs-home${mountPath}${mountOption}`)
     }
 
+    /*  determine null mounts to apply  */
+    const nulls: string[] = mergeList(config[args.context]?.null ?? config.default?.null ?? [], args.null)
+
     /*  determine external bind mounts to expose  */
     const binds: string[] = mergeList(config[args.context]?.bind ?? config.default?.bind ?? [], args.bind)
     const bindPaths: string[] = []
@@ -641,6 +652,8 @@ const spool = new Spool()
         ...mounts.map((m) => m.replace(/!$/, "")),
         String(binds.length),
         ...binds.map((b) => b.replace(/!$/, "")),
+        String(nulls.length),
+        ...nulls,
         envs.join(" "),
         args.sudo ? "yes" : "no",
 
