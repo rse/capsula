@@ -558,13 +558,16 @@ let exiting = false
     }
 
     /*  determine environment variables to expose  */
-    let envs: string[] = mergeList(config[args.context]?.env ?? config.default?.env ?? [], args.env)
+    const envs: string[] = mergeList(config[args.context]?.env ?? config.default?.env ?? [], args.env)
+    for (const env of envs) {
+        const name = env.replace(/^([^=]+)=.*$/, "$1")
+        if (!name.match(/^[A-Za-z_][A-Za-z0-9_]*$/))
+            throw new Error(`invalid environment variable name ${chalk.blue(name)}`)
+        if (!env.includes("=") && process.env[name] === undefined)
+            throw new Error(`environment variable ${chalk.blue(name)} not set on host`)
+    }
     for (const env of envs)
         opts.push("-e", env)
-    envs = envs.map((env) => env.replace(/^([^=]+)=.*$/, "$1"))
-    for (const env of envs)
-        if (!env.match(/^[A-Za-z_][A-Za-z0-9_]*$/))
-            throw new Error(`invalid environment variable name ${chalk.blue(env)}`)
 
     /*  determine dotfile mounts to expose  */
     const mounts: string[] = mergeList(config[args.context]?.mount ?? config.default?.mount ?? [], args.mount)
