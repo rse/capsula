@@ -191,6 +191,7 @@ let exiting = false
             "[-I|--image <image-name>]",
             "[-C|--container <container-name>]",
             "[-V|--volume <volume-name>]",
+            "[-P|--platform <platform>]",
             "[<command> ...]"
         ].join(" "))
         .version(false)
@@ -303,6 +304,13 @@ let exiting = false
             default:  process.env.CAPSULA_VOLUME ?? "",
             describe: "set name of Docker volume"
         })
+        .option("platform", {
+            alias:    "P",
+            type:     "string",
+            coerce:   coerceS<string>,
+            default:  process.env.CAPSULA_PLATFORM ?? "",
+            describe: "set Docker platform (e.g. linux/amd64)"
+        })
         .help("h", "show usage help")
         .alias("h", "help")
         .showHelpOnFail(true)
@@ -376,12 +384,13 @@ let exiting = false
 
     /*  define the container volume, container image and container names  */
     const timestamp = DateTime.now().toFormat("yyyy-MM-dd-HH-mm-ss-SSS")
+    const platformSuffix = args.platform !== "" ? `-${args.platform.replace(/\//g, "-")}` : ""
     const nameImage = args.image !== "" ? args.image :
-        `capsula-${usr}-${args.type}-${args.context}:${pkg.version}`
+        `capsula-${usr}-${args.type}-${args.context}${platformSuffix}:${pkg.version}`
     const nameContainer = args.container !== "" ? args.container :
-        `capsula-${usr}-${args.type}-${args.context}-${timestamp}`
+        `capsula-${usr}-${args.type}-${args.context}${platformSuffix}-${timestamp}`
     const nameVolume = args.volume !== "" ? args.volume :
-        `capsula-${usr}-${args.type}-${args.context}`
+        `capsula-${usr}-${args.type}-${args.context}${platformSuffix}`
 
     /*  determine docker(1) compatible tool  */
     const [ haveDocker, havePodman, haveRancher ] = await Promise.all([
@@ -444,6 +453,7 @@ let exiting = false
                 /*  execute "docker build"  */
                 const response = exec(docker, [
                     "build",
+                    ...(args.platform !== "" ? [ "--platform", args.platform ] : []),
                     "--progress", "plain",
                     "-t", nameImage,
                     "-f", "Dockerfile",
@@ -658,6 +668,7 @@ let exiting = false
     const result = exec(docker, [
         /*  standard arguments  */
         "run",
+        ...(args.platform !== "" ? [ "--platform", args.platform ] : []),
         "--name", nameContainer,
         "--privileged",
         "--rm",

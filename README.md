@@ -78,6 +78,7 @@ $ `capsula`
 \[`-I`|`--image` *image-name*\]
 \[`-C`|`--container` *container-name*\]
 \[`-V`|`--volume` *volume-name*\]
+\[`-P`|`--platform` *platform*\]
 \[*command* ...\]
 
 The particular command-line options and arguments are:
@@ -165,10 +166,12 @@ The particular command-line options and arguments are:
   Set the name of the container image.
   When specified, the container runtime has to be able to fetch it.
   When not specified, it is auto-rebuilt based on the *type* (options `-t`/`--type`).
-  The default is the unique name `capsula-`*username*`-`*type*`-`*context*`:`*version*,
+  The default is the unique name `capsula-`*username*`-`*type*`-`*context*\[`-`*platform*\]`:`*version*,
   where *username* is the username of the current user,
   *type* corresponds to option `-t`/`--type`,
   *context* corresponds to option `-c`/`--context`,
+  *platform* (if given) corresponds to option `-P`/`--platform`
+  with slashes replaced by dashes,
   and *version* is the current **Capsula** version.
   Custom images need to have at least `bash`(1) under the system path `/bin/bash`,
   and the companion commands `hostname`(8), `mount`(8), `umount`(8),
@@ -178,20 +181,33 @@ The particular command-line options and arguments are:
   Set the name of the container.
   When specified, it has to be unique across the container runtime.
   It is created on all executions of **Capsula**.
-  The default is the unique name `capsula-`*username*`-`*type*`-`*context*`-`*timestamp*,
+  The default is the unique name `capsula-`*username*`-`*type*`-`*context*\[`-`*platform*\]`-`*timestamp*,
   where *username* is the username of the current user,
   *type* corresponds to option `-t`/`--type`,
   *context* corresponds to option `-c`/`--context`,
+  *platform* (if given) corresponds to option `-P`/`--platform`
+  with slashes replaced by dashes,
   and *timestamp* is the current timestamp in `yyyy-MM-dd-HH-mm-ss-SSS` format.
 
 - \[`-V`|`--volume` *volume-name*\]:
   Set the name of the container volume.
   When specified, it has to be unique across the container runtime.
   It is initially auto-created and then reused across all executions of **Capsula**.
-  The default is the unique name `capsula-`*username*`-`*type*`-`*context*,
+  The default is the unique name `capsula-`*username*`-`*type*`-`*context*\[`-`*platform*\],
   where *username* is the username of the current user,
   *type* corresponds to option `-t`/`--type`,
-  *context* corresponds to option `-c`/`--context`.
+  *context* corresponds to option `-c`/`--context`,
+  and *platform* (if given) corresponds to option `-P`/`--platform`
+  with slashes replaced by dashes.
+
+- \[`-P`|`--platform` *platform*\]:
+  Set the Docker platform for building and running the container
+  (e.g., `linux/amd64` or `linux/arm64`). This is passed as
+  `--platform` to both `docker build` and `docker run`.
+  When specified, the platform is also encoded into the
+  auto-generated image, container, and volume names
+  (with slashes replaced by dashes) to keep them distinct
+  per platform.
 
 - \[*command* ...\]:
   Execute the particular command inside the Linux Docker container.
@@ -288,6 +304,10 @@ default values for the corresponding command-line options:
   Default value for option `-p`/`--port`.
   Multiple values can be separated by whitespace or comma.
   If not set, defaults to an empty list.
+
+- `CAPSULA_PLATFORM`:
+  Default value for option `-P`/`--platform`.
+  If not set, defaults to no explicit platform (Docker default).
 
 - `CAPSULA_IMAGE`:
   Default value for option `-I`/`--image`.
