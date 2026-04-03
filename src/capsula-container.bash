@@ -120,10 +120,16 @@ for nullpath in "${nulls[@]}"; do
     fi
     if [[ -d "$nullpath" ]]; then
         nullmode=$(stat -c "%a" "$nullpath" 2>/dev/null)
+        if [[ -z "$nullmode" ]]; then
+            echo "capsula: WARNING: failed to determine permissions of directory \"$nullpath\" -- falling back to 0755" 1>&2
+        fi
         mount -t tmpfs -o "size=0,mode=${nullmode:-0755},uid=$uid,gid=$gid" tmpfs "$nullpath" \
             || fatal "failed to null-mount directory \"$nullpath\""
     elif [[ -f "$nullpath" ]]; then
         nullmode=$(stat -c "%a" "$nullpath" 2>/dev/null)
+        if [[ -z "$nullmode" ]]; then
+            echo "capsula: WARNING: failed to determine permissions of file \"$nullpath\" -- falling back to 0644" 1>&2
+        fi
         nullfile=$(mktemp /tmp/capsula-null.XXXXXX)
         chmod "${nullmode:-0644}" "$nullfile"
         chown "$uid:$gid" "$nullfile"
