@@ -59,17 +59,24 @@ mount -t overlay \
     || fatal "failed to mount overlay root filesystem"
 
 #   remount standard system filesystems
-mount --move /proc /mnt/fs-root/proc || fatal "failed to move /proc"
-mount --move /sys  /mnt/fs-root/sys  || fatal "failed to move /sys"
-mount --move /dev  /mnt/fs-root/dev  || fatal "failed to move /dev"
+mount --move /proc /mnt/fs-root/proc \
+    || fatal "failed to move /proc"
+mount --move /sys  /mnt/fs-root/sys \
+    || fatal "failed to move /sys"
+mount --move /dev  /mnt/fs-root/dev \
+    || fatal "failed to move /dev"
 
 #   remount standard Docker bind mounts
-mount --move /etc/resolv.conf /mnt/fs-root/etc/resolv.conf || fatal "failed to move /etc/resolv.conf"
-mount --move /etc/hostname    /mnt/fs-root/etc/hostname    || fatal "failed to move /etc/hostname"
-mount --move /etc/hosts       /mnt/fs-root/etc/hosts       || fatal "failed to move /etc/hosts"
+mount --move /etc/resolv.conf /mnt/fs-root/etc/resolv.conf \
+    || fatal "failed to move /etc/resolv.conf"
+mount --move /etc/hostname    /mnt/fs-root/etc/hostname \
+    || fatal "failed to move /etc/hostname"
+mount --move /etc/hosts       /mnt/fs-root/etc/hosts \
+    || fatal "failed to move /etc/hosts"
 
 #   remount custom Docker bind mounts for run-command script
-mount --move /etc/capsula-container /mnt/fs-root/etc/capsula-container || fatal "failed to move /etc/capsula-container"
+mount --move /etc/capsula-container /mnt/fs-root/etc/capsula-container \
+    || fatal "failed to move /etc/capsula-container"
 
 #   remount custom Docker bind mount for working directory
 mkdir -p "/mnt/fs-root$workdir"
