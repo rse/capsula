@@ -5,12 +5,20 @@ ChangeLog
 1.3.1 (2026-04-03)
 ------------------
 
-- IMPROVEMENT: add null mount option (-n/--null) to hide sensitive files or directories
-- IMPROVEMENT: fallback to /proc manipulation when hostname(8) is not available
-- IMPROVEMENT: validate environment variable names to ensure they are POSIX conform
+- IMPROVEMENT: add null mount option (-n/--null) to hide sensitive files or directories and validate null mount paths
+- IMPROVEMENT: fallback to /proc manipulation when hostname(8) is not available and apply stricter hostname validation
+- IMPROVEMENT: validate environment variable names and values more carefully
 - IMPROVEMENT: support symlinked home and bind mounted directories
+- IMPROVEMENT: warn about not existing dotfiles and bind-mounts
+- IMPROVEMENT: allow directories and files for bind-mounts
+- IMPROVEMENT: improve error handling
 - BUGFIX: ensure that inside the container the same group/gid is used
 - BUGFIX: relocate also existing user if user is already existing in container
+- BUGFIX: do not pass environment variable values into container
+- BUGFIX: guard against parallel cleanup executions
+- BUGFIX: give null mounts proper permissions and owner/group
+- CLEANUP: use consistent error handling and ensure no parallel cleanups happen
+- CLEANUP: various minor code cleanups
 - CLEANUP: update README according to manual page
 
 1.3.0 (2026-04-03)
