@@ -114,6 +114,34 @@ for bind in "${binds[@]}"; do
         || fatal "failed to move bind \"$bind\""
 done
 
+#   null-mount (hide) specified files and directories
+for nullpath in "${nulls[@]}"; do
+    if [[ "$nullpath" != /* ]]; then
+        fatal "null-path \"$nullpath\" is not an absolute path"
+    fi
+    if [[ -d "/mnt/fs-root$nullpath" ]]; then
+        nullmode=$(stat -c "%a" "/mnt/fs-root$nullpath" 2>/dev/null)
+        if [[ -z "$nullmode" ]]; then
+            echo "capsula: WARNING: failed to determine permissions of directory \"$nullpath\" -- falling back to 0755" 1>&2
+        fi
+        mount -t tmpfs -o "size=0,mode=${nullmode:-0755},uid=$uid,gid=$gid" tmpfs "/mnt/fs-root$nullpath" \
+            || fatal "failed to null-mount directory \"$nullpath\""
+    elif [[ -f "/mnt/fs-root$nullpath" ]]; then
+        nullmode=$(stat -c "%a" "/mnt/fs-root$nullpath" 2>/dev/null)
+        if [[ -z "$nullmode" ]]; then
+            echo "capsula: WARNING: failed to determine permissions of file \"$nullpath\" -- falling back to 0644" 1>&2
+        fi
+        nullfile=$(mktemp /tmp/capsula-null.XXXXXX)
+        chmod "${nullmode:-0644}" "$nullfile"
+        chown "$uid:$gid" "$nullfile"
+        mount --bind "$nullfile" "/mnt/fs-root$nullpath" \
+            || fatal "failed to null-mount file \"$nullpath\""
+        rm -f "$nullfile"
+    else
+        echo "capsula: WARNING: null-path \"$nullpath\" neither directory nor file -- skipping" 1>&2
+    fi
+done
+
 #   switch root filesystem
 mkdir -p /mnt/fs-root/fs-root-old
 cd /mnt/fs-root
@@ -121,34 +149,6 @@ pivot_root . fs-root-old \
     || fatal "failed to pivot root filesystem"
 umount -l /fs-root-old \
     || fatal "failed to unmount old root filesystem"
-
-#   null-mount (hide) specified files and directories
-for nullpath in "${nulls[@]}"; do
-    if [[ "$nullpath" != /* ]]; then
-        fatal "null-path \"$nullpath\" is not an absolute path"
-    fi
-    if [[ -d "$nullpath" ]]; then
-        nullmode=$(stat -c "%a" "$nullpath" 2>/dev/null)
-        if [[ -z "$nullmode" ]]; then
-            echo "capsula: WARNING: failed to determine permissions of directory \"$nullpath\" -- falling back to 0755" 1>&2
-        fi
-        mount -t tmpfs -o "size=0,mode=${nullmode:-0755},uid=$uid,gid=$gid" tmpfs "$nullpath" \
-            || fatal "failed to null-mount directory \"$nullpath\""
-    elif [[ -f "$nullpath" ]]; then
-        nullmode=$(stat -c "%a" "$nullpath" 2>/dev/null)
-        if [[ -z "$nullmode" ]]; then
-            echo "capsula: WARNING: failed to determine permissions of file \"$nullpath\" -- falling back to 0644" 1>&2
-        fi
-        nullfile=$(mktemp /tmp/capsula-null.XXXXXX)
-        chmod "${nullmode:-0644}" "$nullfile"
-        chown "$uid:$gid" "$nullfile"
-        mount --bind "$nullfile" "$nullpath" \
-            || fatal "failed to null-mount file \"$nullpath\""
-        rm -f "$nullfile"
-    else
-        echo "capsula: WARNING: null-path \"$nullpath\" neither directory nor file -- skipping" 1>&2
-    fi
-done
 
 #   provide hint about environment, platform distribution and platform architecture
 ENVIRONMENT="capsula"; export ENVIRONMENT
