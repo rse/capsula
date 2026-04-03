@@ -11,13 +11,13 @@ FROM        archlinux/archlinux:base
 WORKDIR     /
 
 #   prepare and update system to latest
-RUN         pacman -Syu --noconfirm
+RUN         pacman -Syu --noconfirm --disable-sandbox
 
 #   install additional tools
-RUN         pacman -Sy --noconfirm ca-certificates
+RUN         pacman -Sy --noconfirm --disable-sandbox ca-certificates
 
 #   install additional tools
-RUN         pacman -Sy --noconfirm \
+RUN         pacman -Sy --noconfirm --disable-sandbox \
                 sudo bash less tmux vim curl git \
                 procps-ng net-tools inetutils htop lsof strace \
                 man-db man-pages
@@ -45,8 +45,8 @@ VOLUME      /mnt/fs-volume
 RUN         chmod 777 /mnt/fs-volume
 
 #   cleanup
-RUN         pacman -Rns --noconfirm $(pacman -Qtdq) 2>/dev/null || true && \
-            pacman -Scc --noconfirm && \
+RUN         pacman -Rns --noconfirm --disable-sandbox $(pacman -Qtdq) 2>/dev/null || true && \
+            pacman -Scc --noconfirm --disable-sandbox && \
             rm -rf /var/cache/pacman/pkg/*
 RUN         rm -rf /tmp/* /var/tmp/*
 
