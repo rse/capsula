@@ -70,10 +70,10 @@ $ `capsula`
 \[`-d`|`--docker` *docker*\]
 \[`-c`|`--context` *context*\]
 \[`-s`|`--sudo`\]
-\[`-e`|`--env` *variable*\]
+\[`-e`|`--env` *variable*\[`=`*value*\]\]
 \[`-m`|`--mount` *dotfile*\]
 \[`-b`|`--bind` *path*\]
-\[`-p`|`--port` *port*\]
+\[`-p`|`--port` *port-spec*\]
 \[`-I`|`--image` *image-name*\]
 \[`-C`|`--container` *container-name*\]
 \[`-V`|`--volume` *volume-name*\]
@@ -111,11 +111,13 @@ The particular command-line options and arguments are:
 - \[`-s`|`--sudo`\]:
   Enable sudo(8) for user in container.
 
-- \[`-e`|`--env` *variable*\]:
+- \[`-e`|`--env` *variable*\[`=`*value*\]\]:
   Pass environment variable to encapsulated command.
   This option can be given multiple times.
   Passing `!` as *variable* resets the environment variables
   from the *context* given by the specified *config* or the default.
+  Giving *value* allows optionally to override the value of the
+  environment variable.
 
 - \[`-m`|`--mount` *dotfile*\]:
   Pass dotfile to encapsulated command.
@@ -133,10 +135,17 @@ The particular command-line options and arguments are:
   Passing `!` as *path* resets the bind mounts
   from the *context* given by the specified *config* or the default.
 
-- \[`-p`|`--port` *port*\]:
+- \[`-p`|`--port` *port-spec*\]:
   Map port for encapsulated command.
+  The *port-spec* can be a plain port number (e.g., `8080`),
+  a *host-port*`:`*container-port* pair (e.g., `8080:9090`),
+  an *ip*`:`*host-port*`:`*container-port* triple (e.g., `127.0.0.1:8080:9090`
+  or `[::1]:8080:9090` for IPv6),
+  or any of these with a `/tcp` or `/udp` protocol suffix (e.g., `8080/udp`).
+  A plain port number is mapped identically on both host and container side.
+  Port numbers must be in the range 1-65535.
   This option can be given multiple times.
-  Passing `!` as *port* resets the ports
+  Passing `!` as *port-spec* resets the ports
   from the *context* given by the specified *config* or the default.
 
 - \[`-I`|`--image` *image-name*\]:
@@ -200,7 +209,7 @@ default:
         - .cache!
     bind: []
     port:
-        - 8888
+        - "8888"
 ```
 
 An overriding custom configuration file can be given with option `-f`/`--config`.
@@ -209,17 +218,104 @@ Option `-m`/`--mount` can be used to override the section `mount`.
 Option `-b`/`--bind` can be used to override the section `bind`.
 Option `-p`/`--port` can be used to override the section `port`.
 
+Environment
+-----------
+
+The following environment variables can be used to provide
+default values for the corresponding command-line options:
+
+- `CAPSULA_CONFIG`:
+  Default value for option `-f`/`--config`.
+  If not set, defaults to `$HOME/.capsula.yaml`.
+
+- `CAPSULA_LOGLEVEL`:
+  Default value for option `-l`/`--log-level`.
+  If not set, defaults to `info`.
+
+- `CAPSULA_TYPE`:
+  Default value for option `-t`/`--type`.
+  If not set, defaults to `debian`.
+
+- `CAPSULA_DOCKER`:
+  Default value for option `-d`/`--docker`.
+  If not set, auto-detects `docker`, `podman`, or `nerdctl`.
+
+- `CAPSULA_CONTEXT`:
+  Default value for option `-c`/`--context`.
+  If not set, defaults to `default`.
+
+- `CAPSULA_SUDO`:
+  Default value for option `-s`/`--sudo`.
+  Set to `true`, `1`, or `yes` (case-insensitive) to enable.
+  If not set, defaults to `false`.
+
+- `CAPSULA_ENV`:
+  Default value for option `-e`/`--env`.
+  Multiple values can be separated by whitespace or comma.
+  If not set, defaults to an empty list.
+
+- `CAPSULA_MOUNT`:
+  Default value for option `-m`/`--mount`.
+  Multiple values can be separated by whitespace or comma.
+  If not set, defaults to an empty list.
+
+- `CAPSULA_BIND`:
+  Default value for option `-b`/`--bind`.
+  Multiple values can be separated by whitespace or comma.
+  If not set, defaults to an empty list.
+
+- `CAPSULA_PORT`:
+  Default value for option `-p`/`--port`.
+  Multiple values can be separated by whitespace or comma.
+  If not set, defaults to an empty list.
+
+- `CAPSULA_IMAGE`:
+  Default value for option `-I`/`--image`.
+  If not set, the image name is auto-generated.
+
+- `CAPSULA_CONTAINER`:
+  Default value for option `-C`/`--container`.
+  If not set, the container name is auto-generated.
+
+- `CAPSULA_VOLUME`:
+  Default value for option `-V`/`--volume`.
+  If not set, the volume name is auto-generated.
+
 Example
 -------
 
-The following installs and runs *Claude Code* inside an encapsulated
-environment:
+The following installs *Node.js* and *Claude Code* inside an
+encapsulated environment with the help of `capsula`(1) and `yq`(1):
 
 ```sh
-$ capsula apt update
-$ capsula apt install -y nodejs
-$ capsula npm install -g @anthropic-ai/claude-code
-$ capsula claude
+# update system
+capsula -s sudo apt update
+capsula -s sudo apt upgrade
+
+# install Node.js
+capsula -s bash -c \
+    "curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -"
+capsula -s sudo apt install -y nodejs
+
+# configure NPM environment
+yq -i '.claude.env += [ "NPM=/npm" ]' ~/.capsula.yaml
+yq -i '.claude.env += [ "NPM_CONFIG_PREFIX=/npm" ]' ~/.capsula.yaml
+yq -i '.claude.env += [ "NPM_CONFIG_CACHE=/npm/.cache" ]' ~/.capsula.yaml
+capsula -s sudo bash -c 'mkdir $NPM && chown $USER:$GROUP $NPM'
+
+# install Claude Code and companion tools into NPM environment
+capsula npm install -y -g @anthropic-ai/claude-code
+capsula npm install -y -g ccstatusline
+capsula npm install -y -g tweakcc
+
+# configure Claude Code environment
+yq -i '.claude.mount += [ ".claude/" ]' ~/.capsula.yaml
+yq -i '.claude.mount += [ ".claude.json" ]' ~/.capsula.yaml
+yq -i '.claude.mount += [ ".config/ccstatusline/" ]' ~/.capsula.yaml
+yq -i '.claude.mount += [ ".tweakcc/" ]' ~/.capsula.yaml
+
+# use Claude Code
+echo 'alias claude="capsula -c claude /npm/bin/claude"' >~/.dotfiles/bashrc
 ```
 
 Design
@@ -252,12 +348,21 @@ commands with the following distinct design:
    *RATIONALE*: This allows one to run the command inside the container
    with the same configuration as it is available on the host.
 
-4. *Parent Paths inside Root Directory* (root read/write):
+4. *External Bind Mounts* (user read-only or read-write):
+   Arbitrary directories outside the home directory can be bind-mounted
+   into the container with their original paths preserved.
+   By default, external bind mounts are read-only. Appending `!` to
+   the path makes them read-write.
+   *RATIONALE*: This allows commands inside the container to access
+   external data directories (e.g., `/data/projects`, `/opt/tools`)
+   without granting access to the entire host filesystem.
+
+5. *Parent Paths inside Root Directory* (root read/write):
    The parent directories of the home directory
    up to the root directory are exactly those as provided by the
    Linux container operating system, but changes are
    persisted across container usages in a Docker volume.
-   *RATIONALE*: This allows to permanently install tools (as `root` via `sudo`(8))
+   *RATIONALE*: This allows one to permanently install tools (as `root` via `sudo`(8))
    into the container in an arbitrary way without having
    to build a custom container image.
 
