@@ -9,7 +9,7 @@
 fatal () { echo "capsula: ERROR: $1" 1>&2; exit 1; }
 
 #   take over parameters
-platform="$1"; shift
+distro="$1"; shift
 hostname="$1"; shift
 usr="$1";      shift
 uid="$1";      shift
@@ -143,9 +143,10 @@ for nullpath in "${nulls[@]}"; do
     fi
 done
 
-#   provide hint about environment and platform
+#   provide hint about environment, platform distribution and platform architecture
 ENVIRONMENT="capsula"; export ENVIRONMENT
-PLATFORM="$platform";  export PLATFORM
+PLATFORM_DISTRO="$distro"; export PLATFORM_DISTRO
+PLATFORM_ARCH="$(uname -m)"; export PLATFORM_ARCH
 
 #   enforce shell
 SHELL="/bin/bash"; export SHELL
@@ -155,7 +156,7 @@ USER="$usr";  export USER
 GROUP="$grp"; export GROUP
 
 #   determine list of environment variables to pass-through
-preserve="ENVIRONMENT,PLATFORM,SHELL,USER,GROUP"
+preserve="ENVIRONMENT,PLATFORM_DISTRO,PLATFORM_ARCH,SHELL,USER,GROUP"
 if [[ -n "$envvars" ]]; then
     preserve="$preserve,$(echo "$envvars" | sed -e 's; ;,;g')"
 fi
@@ -187,7 +188,7 @@ if ! getent passwd "$usr" >/dev/null 2>&1; then
             fatal "failed to move user \"$usr_exists\" to \"$uid_free\""
         fi
     fi
-    if [[ "$platform" == "alpine" ]]; then
+    if [[ "$distro" == "alpine" ]]; then
         if ! useradd -M -d "$homedir" -s "$SHELL" -u "$uid" -g "$grp" "$usr" >/dev/null 2>&1; then
             fatal "failed to create user \"$usr\" ($uid)"
         fi

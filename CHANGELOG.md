@@ -8,6 +8,7 @@ ChangeLog
 - IMPROVEMENT: add platform (-P/--platform) option to use linux/amd64 and linux/arm64 containers
 - BUGFIX: add ISO-8859-1/ISO-8859-15 locale support to Arch Linux container
 - BUGFIX: fix pacman usage in Arch Linux container by disabling sandboxing
+- CLEANUP: provide variables PLATFORM\_DISTRO and PLATFORM\_ARCH inside containers
 
 1.3.1 (2026-04-03)
 ------------------

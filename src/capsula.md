@@ -53,7 +53,7 @@ The following command-line options and arguments exist to the `capsula(1)` comma
   Set the logging level: `error`, `warning`, `info` or `debug`.
 
 - \[`-t`|`--type` *type*\]:
-  Use a certain Linux platform for the Docker container.
+  Use a certain Linux distribution type for the Docker container.
   Currently `alpine`, `debian`, `ubuntu`, `alma`, `fedora`, `arch`,
   and `opensuse` are supported.
 
