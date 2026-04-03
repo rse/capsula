@@ -177,7 +177,7 @@ if ! getent passwd "$usr" >/dev/null 2>&1; then
     fi
 fi
 
-#   allows user to switch to superuser
+#   allow user to switch to superuser
 if [[ $sudo == "yes" ]]; then
     echo "$usr ALL=(ALL:ALL) NOPASSWD: ALL" >"/etc/sudoers.d/capsula"
     chmod 440 "/etc/sudoers.d/capsula"
