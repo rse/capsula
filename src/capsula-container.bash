@@ -150,7 +150,8 @@ fi
 chown "$usr:$grp" "$homedir"
 
 #   implicitly change current working directory
-cd "$workdir"
+cd "$workdir" \
+    || fatal "failed to change to working directory \"$workdir\""
 
 #   pass-through execution
 if [[ $# -eq 0 ]]; then
