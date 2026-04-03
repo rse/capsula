@@ -31,7 +31,7 @@ on a *Docker* or *Podman* container.
 
 The crux is that the **Capsula** container environment provides a
 special filesystem layout to the command, which mimics the host
-filesystem paths as close as possible, but prevents access to
+filesystem paths as closely as possible, but prevents access to
 non-relevant areas of the user's home directory and persists changes to
 the operating system.
 
