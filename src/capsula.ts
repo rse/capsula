@@ -161,6 +161,9 @@ let cli: CLIio | null = null
 /*  central resource spool  */
 const spool = new Spool()
 
+/*  guard against concurrent process exit  */
+let exiting = false
+
 /*  establish asynchronous environment  */
 ;(async () => {
     /*  ensure proper cleanup  */
@@ -669,7 +672,7 @@ const spool = new Spool()
 
     /*  propagate signals to container child process  */
     let forceKillScheduled = false
-    let handled = false
+    let forceKillTimer: ReturnType<typeof setTimeout> | null = null
     for (const signal of [ "SIGINT", "SIGTERM" ] as const) {
         process.on(signal, () => {
             result.kill(signal)
@@ -677,24 +680,28 @@ const spool = new Spool()
             /*  force-kill safety net  */
             if (!forceKillScheduled) {
                 forceKillScheduled = true
-                setTimeout(safeAsync(async () => {
-                    if (handled)
+                forceKillTimer = setTimeout(safeAsync(async () => {
+                    if (exiting)
                         return
-                    handled = true
+                    exiting = true
                     result.kill("SIGKILL")
                     await spool.unroll()
                     const sigNum = os.constants.signals[signal]
                     process.exit(128 + (sigNum ?? 0))
-                }), 10 * 1000).unref()
+                }), 10 * 1000)
+                forceKillTimer.unref()
             }
         })
     }
 
     /*  handle container termination  */
     result.on("exit", safeAsync(async (code: number | null, signal: string | null) => {
-        if (handled)
+        /*  cancel pending force-kill timer and claim exit  */
+        if (forceKillTimer !== null)
+            clearTimeout(forceKillTimer)
+        if (exiting)
             return
-        handled = true
+        exiting = true
 
         /*  cleanup resources  */
         await spool.unroll()
@@ -716,9 +723,12 @@ const spool = new Spool()
 
     /*  handle execution errors  */
     result.on("error", safeAsync(async (err: Error) => {
-        if (handled)
+        /*  cancel pending force-kill timer and claim exit  */
+        if (forceKillTimer !== null)
+            clearTimeout(forceKillTimer)
+        if (exiting)
             return
-        handled = true
+        exiting = true
 
         /*  cleanup resources and terminate ungracefully  */
         cli!.log("error", err.message ?? err)
@@ -729,6 +739,10 @@ const spool = new Spool()
     /*  suppress unhandled promise rejection errors  */
     result.catch(() => {})
 })().catch(async (err: unknown) => {
+    if (exiting)
+        return
+    exiting = true
+
     /*  cleanup resources and terminate ungracefully  */
     const msg = (err instanceof Error ? err.message : String(err))
     if (cli !== null)
