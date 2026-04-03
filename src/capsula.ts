@@ -34,6 +34,7 @@ import rawDockerAlma           from "./capsula-container-alma.dockerfile?raw"   
 import rawDockerFedora         from "./capsula-container-fedora.dockerfile?raw"   with { type: "string" }
 import rawDockerArch           from "./capsula-container-arch.dockerfile?raw"     with { type: "string" }
 import rawDockerOpenSUSE       from "./capsula-container-opensuse.dockerfile?raw" with { type: "string" }
+import rawDockerVoid           from "./capsula-container-void.dockerfile?raw"     with { type: "string" }
 import rawBash                 from "./capsula-container.bash?raw"                with { type: "string" }
 import rawDefaults             from "./capsula.yaml?raw"                          with { type: "string" }
 
@@ -223,7 +224,7 @@ let exiting = false
             type:     "string",
             coerce:   coerceS<string>,
             default:  process.env.CAPSULA_TYPE ?? "debian",
-            choices:  [ "alpine", "debian", "ubuntu", "alma", "fedora", "arch", "opensuse" ] as const,
+            choices:  [ "alpine", "debian", "ubuntu", "alma", "fedora", "arch", "opensuse", "void" ] as const,
             describe: "set Linux platform type to use for container"
         })
         .option("docker", {
@@ -427,7 +428,8 @@ let exiting = false
                 alma:     rawDockerAlma,
                 fedora:   rawDockerFedora,
                 arch:     rawDockerArch,
-                opensuse: rawDockerOpenSUSE
+                opensuse: rawDockerOpenSUSE,
+                void:     rawDockerVoid
             }
             const dockerfileText = dockerfileMap[args.type] ?? ""
             await fs.promises.writeFile(dockerfile, dockerfileText, { encoding: "utf8" })

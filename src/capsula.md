@@ -55,7 +55,7 @@ The following command-line options and arguments exist to the `capsula(1)` comma
 - \[`-t`|`--type` *type*\]:
   Use a certain Linux distribution type for the Docker container.
   Currently `alpine`, `debian`, `ubuntu`, `alma`, `fedora`, `arch`,
-  and `opensuse` are supported.
+  `opensuse`, and `void` are supported.
 
 - \[`-d`|`--docker` *docker*\]:
   Use a certain `docker`(1) compatible command for access
