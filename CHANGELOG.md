@@ -6,8 +6,14 @@ ChangeLog
 ------------------
 
 - IMPROVEMENT: add Void Linux distribution support
+- IMPROVEMENT: complain on non-absolute null mount paths
+- IMPROVEMENT: move null mounts earlier for better alignment with other manipulations
+- IMPROVEMENT: improve output for debug logging
 - BUGFIX: do not pass invalid bind-mounts to container startup script
 - BUGFIX: make Docker volume check more robust
+- BUGFIX: fix grammar in manual page
+- CLEANUP: improve and sync manual page with README
+- CLEANUP: various minor code and configuration cleanups
 
 1.3.2 (2026-04-03)
 ------------------
