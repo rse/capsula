@@ -530,7 +530,7 @@ let exiting = false
     let volumeExists: boolean
     if (volumeInspect.exitCode === 0)
         volumeExists = true
-    else if (/no such volume/i.test(volumeInspect.stderr))
+    else if (/no such volume|volume not found|no volume/i.test(volumeInspect.stderr))
         volumeExists = false
     else
         throw new Error("failed to inspect persistent volume: " +

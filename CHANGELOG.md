@@ -7,6 +7,7 @@ ChangeLog
 
 - IMPROVEMENT: add Void Linux distribution support
 - BUGFIX: do not pass invalid bind-mounts to container startup script
+- BUGFIX: make Docker volume check more robust
 
 1.3.2 (2026-04-03)
 ------------------
