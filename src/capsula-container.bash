@@ -41,7 +41,11 @@ if [[ ! "$hostname" =~ ^[a-zA-Z0-9._-]+$ ]]; then
 fi
 echo "127.0.0.1 $hostname" >>/etc/hosts
 echo "$hostname" >/etc/hostname
-hostname "$hostname"
+if command -v hostname >/dev/null 2>&1; then
+    hostname "$hostname"
+else
+    echo "$hostname" >/proc/sys/kernel/hostname
+fi
 HOSTNAME="$hostname"
 export HOSTNAME
 
