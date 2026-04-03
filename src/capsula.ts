@@ -666,6 +666,7 @@ const spool = new Spool()
 
     /*  propagate signals to container child process  */
     let forceKillScheduled = false
+    let handled = false
     for (const signal of [ "SIGINT", "SIGTERM" ] as const) {
         process.on(signal, () => {
             result.kill(signal)
@@ -674,6 +675,9 @@ const spool = new Spool()
             if (!forceKillScheduled) {
                 forceKillScheduled = true
                 setTimeout(safeAsync(async () => {
+                    if (handled)
+                        return
+                    handled = true
                     result.kill("SIGKILL")
                     await spool.unroll()
                     const sigNum = os.constants.signals[signal]
@@ -685,6 +689,10 @@ const spool = new Spool()
 
     /*  handle container termination  */
     result.on("exit", safeAsync(async (code: number | null, signal: string | null) => {
+        if (handled)
+            return
+        handled = true
+
         /*  cleanup resources  */
         await spool.unroll()
 
@@ -705,6 +713,10 @@ const spool = new Spool()
 
     /*  handle execution errors  */
     result.on("error", safeAsync(async (err: Error) => {
+        if (handled)
+            return
+        handled = true
+
         /*  cleanup resources and terminate ungracefully  */
         cli!.log("error", err.message ?? err)
         await spool.unroll()
