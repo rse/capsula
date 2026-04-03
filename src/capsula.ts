@@ -532,7 +532,7 @@ let exiting = false
         volumeExists = false
     else
         throw new Error("failed to inspect persistent volume: " +
-            ((volumeInspect.stderr || null) ?? `unknown reason (exit code: ${volumeInspect.exitCode})`))
+            ((volumeInspect.stderr !== "" ? volumeInspect.stderr : null) ?? `unknown reason (exit code: ${volumeInspect.exitCode})`))
     if (!volumeExists) {
         cli.log("info", `creating persistent volume ${chalk.blue(nameVolume)}`)
         await exec(docker, [ "volume", "create", nameVolume ], { stdio: "ignore" })
@@ -757,7 +757,7 @@ let exiting = false
     /*  handle execution errors  */
     result.on("error", safeAsync(async (err: Error) => {
         /*  log error and shutdown  */
-        cli!.log("error", err.message ?? err)
+        cli!.log("error", err.message ?? String(err))
         await shutdown(1)
     }))
 

@@ -234,7 +234,7 @@ else
     #   execute batch command
     cmd=""
     for arg in "$@"; do
-        cmd="$cmd $(printf '%q' "$arg")"
+        cmd="${cmd:+$cmd }$(printf '%q' "$arg")"
     done
     exec sudo -n "--preserve-env=$preserve" -g "$grp" -u "$usr" "$SHELL" -l -c "exec $cmd"
 fi
