@@ -589,6 +589,15 @@ let exiting = false
 
     /*  determine null mounts to apply  */
     const nulls: string[] = mergeList(config[args.context]?.null ?? config.default?.null ?? [], args.null)
+    for (let i = 0; i < nulls.length; i++) {
+        let nullPath = nulls[i]
+        if (!path.isAbsolute(nullPath))
+            nullPath = path.resolve(workdir, nullPath)
+        const stat = fs.statSync(nullPath, { throwIfNoEntry: false })
+        if (stat === undefined || (!stat.isDirectory() && !stat.isFile()))
+            throw new Error(`null path ${chalk.blue(nullPath)} does not exist`)
+        nulls[i] = nullPath
+    }
 
     /*  determine external bind mounts to expose  */
     const binds: string[] = mergeList(config[args.context]?.bind ?? config.default?.bind ?? [], args.bind)
