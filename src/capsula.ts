@@ -713,12 +713,13 @@ const spool = new Spool()
 
     /*  suppress unhandled promise rejection errors  */
     result.catch(() => {})
-})().catch(async (err) => {
+})().catch(async (err: unknown) => {
     /*  cleanup resources and terminate ungracefully  */
+    const msg = (err instanceof Error ? err.message : String(err))
     if (cli !== null)
-        cli.log("error", err.message ?? err)
+        cli.log("error", msg)
     else
-        process.stderr.write(`capsula: ${chalk.red("ERROR")}: ${err.message ?? err} ${err.stack}\n`)
+        process.stderr.write(`capsula: ${chalk.red("ERROR")}: ${msg}\n`)
     await spool.unroll()
     process.exit(1)
 })
