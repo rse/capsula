@@ -368,6 +368,41 @@ commands with the following distinct design:
    bind-mounted directories, preventing the encapsulated command
    from accessing them.
 
+## INTERNALS
+
+**Capsula** achieves the above filesystem layout with the following
+way of manipulating the filesystem structure:
+
+1. *PASS 1: CONTAINER OVERLAY*:
+   The entire container image filesystem is shadowed with an overlayed
+   filesystem, staying in the volume *volume-name*, as specified by
+   option `-V`/`--volume`. This keeps the container image sane and
+   still allows changes to the Linux operating system, even across
+   multiple container starts. Additionally, it will receive
+   all changes outside the working directory, and hence especially
+   provide the empty space around the home directory and around
+   the working directory. In order to get rid of all changes stored
+   in the volume, the volume can be removed with `docker volume rm
+   `*volume-name*.
+
+2. *PASS 2: STANDARD CONTAINER PATHS*:
+   Standard Linux filesystems `/proc`, `/sys`, and `/dev`,
+   Docker's own bind mounts for files `/etc/resolv.conf`,
+   `/etc/hostname`, and `/etc/hosts`, **Capsula**'s own startup script
+   `/etc/capsula-container`, all **Capsula** bind mounts (option
+   `-b`/`--bind`) are moved from below to above the overlay
+   filesystem to not be shadowed.
+
+3. *PASS 3: HOST INCLUSION PATHS*:
+   From the host environment, the current working directory (usually
+   at or below either the home directory or one of the bind mounts),
+   the relevant dotfiles in the home directory (`$HOME/.foo`), and the
+   optional bind mounts are overlayed.
+
+4. *PASS 4: HOST EXCLUSION PATHS*:
+   The optional null mounts are overlayed to shadow sensitive files or
+   directories from the host environment.
+
 ## SEE ALSO
 
 `docker`(1), `yq`(1).
