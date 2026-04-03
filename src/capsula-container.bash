@@ -118,7 +118,7 @@ umount -l /fs-root-old \
 #   null-mount (hide) specified files and directories
 for nullpath in "${nulls[@]}"; do
     if [[ "$nullpath" != /* ]]; then
-        nullpath="$workdir/$nullpath"
+        fatal "null-path \"$nullpath\" is not an absolute path"
     fi
     if [[ -d "$nullpath" ]]; then
         nullmode=$(stat -c "%a" "$nullpath" 2>/dev/null)
