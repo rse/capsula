@@ -381,3 +381,4 @@ like `claude`(1) (*Claude Code*) or `codex`(1) (*OpenAI Codex*).
 ## AUTHOR
 
 Dr. Ralf S. Engelschall <rse@engelschall.com>
+
