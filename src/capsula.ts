@@ -193,6 +193,7 @@ let exiting = false
             "[-C|--container <container-name>]",
             "[-V|--volume <volume-name>]",
             "[-P|--platform <platform>]",
+            "[-N|--network <network>]",
             "[<command> ...]"
         ].join(" "))
         .version(false)
@@ -311,6 +312,13 @@ let exiting = false
             coerce:   coerceS<string>,
             default:  process.env.CAPSULA_PLATFORM ?? "",
             describe: "set Docker platform (e.g. linux/amd64)"
+        })
+        .option("network", {
+            alias:    "N",
+            type:     "string",
+            coerce:   coerceS<string>,
+            default:  process.env.CAPSULA_NETWORK ?? "",
+            describe: "set Docker network (e.g. host, bridge, none, or user-defined network name)"
         })
         .help("h", "show usage help")
         .alias("h", "help")
@@ -674,6 +682,7 @@ let exiting = false
         /*  standard arguments  */
         "run",
         ...(args.platform !== "" ? [ "--platform", args.platform ] : []),
+        ...(args.network  !== "" ? [ "--network",  args.network  ] : []),
         "--name", nameContainer,
         "--privileged",
         "--rm",

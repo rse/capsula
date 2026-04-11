@@ -21,6 +21,7 @@
 \[`-C`|`--container` *container-name*\]
 \[`-V`|`--volume` *volume-name*\]
 \[`-P`|`--platform` *platform*\]
+\[`-N`|`--network` *network*\]
 \[*command* ...\]
 
 ## DESCRIPTION
@@ -165,6 +166,12 @@ The following command-line options and arguments exist to the `capsula(1)` comma
   (with slashes replaced by dashes) to keep them distinct
   per platform.
 
+- \[`-N`|`--network` *network*\]:
+  Set the Docker network mode for the encapsulated container
+  (e.g., `host`, `bridge`, `none`, or a user-defined network name).
+  This is passed as `--network` to `docker run`.
+  When not specified, Docker's default network applies.
+
 - \[*command* ...\]:
   Execute the particular command inside the Linux Docker container.
   If missing, `bash`(1) is called.
@@ -262,6 +269,10 @@ default values for the corresponding command-line options:
 - `CAPSULA_PLATFORM`:
   Default value for option `-P`/`--platform`.
   If not set, defaults to no explicit platform (Docker default).
+
+- `CAPSULA_NETWORK`:
+  Default value for option `-N`/`--network`.
+  If not set, defaults to no explicit network (Docker default).
 
 - `CAPSULA_IMAGE`:
   Default value for option `-I`/`--image`.
