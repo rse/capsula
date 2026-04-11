@@ -6,6 +6,7 @@ ChangeLog
 ------------------
 
 - IMPROVEMENT: add network (-N/--network) option to control Docker container network mode
+- UPGRADE: upgrade NPM dependencies
 
 1.3.3 (2026-04-03)
 ------------------
