@@ -405,7 +405,7 @@ let exiting = false
                 havePodman ? "podman" : (
                     haveRancher ? "nerdctl" : ""))))
     if (docker === "")
-        throw new Error("neither docker(1), podman(1) or nerdctl(1) command found in shell path")
+        throw new Error("neither docker(1), podman(1), nor nerdctl(1) command found in shell path")
     cli.log("debug", `docker command: ${chalk.blue(docker)}`)
 
     /*  create container image  */
@@ -566,11 +566,15 @@ let exiting = false
         return result
     }
 
+    /*  helper function for resolving a config list for the current context  */
+    const configList = (key: string, overrides: string[]): string[] =>
+        mergeList(config[args.context]?.[key] ?? config.default?.[key] ?? [], overrides)
+
     /*  determine environment variables to expose  */
-    const envs: string[] = mergeList(config[args.context]?.env ?? config.default?.env ?? [], args.env)
+    const envs = configList("env", args.env)
     for (const env of envs) {
         const name = env.replace(/^([^=]+)=.*$/, "$1")
-        if (!name.match(/^[A-Za-z_][A-Za-z0-9_]*$/))
+        if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(name))
             throw new Error(`invalid environment variable name ${chalk.blue(name)}`)
         if (!env.includes("=") && process.env[name] === undefined)
             throw new Error(`environment variable ${chalk.blue(name)} not set on host`)
@@ -579,7 +583,7 @@ let exiting = false
         opts.push("-e", env)
 
     /*  determine dotfile mounts to expose  */
-    const mounts: string[] = mergeList(config[args.context]?.mount ?? config.default?.mount ?? [], args.mount)
+    const mounts = configList("mount", args.mount)
     const mountsEffective: string[] = []
     for (let mount of mounts) {
         let ro = true
@@ -599,7 +603,7 @@ let exiting = false
     }
 
     /*  determine null mounts to apply  */
-    const nulls: string[] = mergeList(config[args.context]?.null ?? config.default?.null ?? [], args.null)
+    const nulls = configList("null", args.null)
     for (let i = 0; i < nulls.length; i++) {
         let nullPath = nulls[i]
         if (!path.isAbsolute(nullPath))
@@ -611,7 +615,7 @@ let exiting = false
     }
 
     /*  determine external bind mounts to expose  */
-    const binds: string[] = mergeList(config[args.context]?.bind ?? config.default?.bind ?? [], args.bind)
+    const binds = configList("bind", args.bind)
     const bindDirs: string[] = []
     for (let bind of binds) {
         let ro = true
@@ -640,7 +644,7 @@ let exiting = false
             "nor at or below any bind-mounted directory")
 
     /*  determine ports to expose  */
-    const ports: string[] = mergeList(config[args.context]?.port ?? config.default?.port ?? [], args.port)
+    const ports = configList("port", args.port)
     for (const port of ports) {
         const m = port.match(/^(?:(\[[A-Fa-f0-9.:]+\]|[A-Fa-f0-9.]+):)?(?:(\d+):)?(\d+)(\/(?:tcp|udp))?$/)
         if (!m)
