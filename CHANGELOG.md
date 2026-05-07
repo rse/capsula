@@ -2,7 +2,12 @@
 ChangeLog
 =========
 
-1.3.4 (unreleased)
+1.3.5 (2026-04-11)
+------------------
+
+- UPGRADE: upgrade NPM dependencies
+
+1.3.4 (2026-04-11)
 ------------------
 
 - IMPROVEMENT: add network (-N/--network) option to control Docker container network mode
