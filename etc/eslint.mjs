@@ -6,9 +6,7 @@
 
 import pluginJs      from "@eslint/js"
 import pluginStd     from "neostandard"
-import pluginN       from "eslint-plugin-n"
 import pluginImport  from "eslint-plugin-import"
-import pluginPromise from "eslint-plugin-promise"
 import pluginTS      from "typescript-eslint"
 import globals       from "globals"
 import parserTS      from "@typescript-eslint/parser"
@@ -22,9 +20,7 @@ export default [
     }),
     {
         plugins: {
-            "n":       pluginN,
-            "import":  pluginImport,
-            "promise": pluginPromise
+            "import":  pluginImport
         },
         files: [ "src/**/*.ts" ],
         languageOptions: {
