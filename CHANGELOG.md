@@ -6,6 +6,8 @@ ChangeLog
 ------------------
 
 - UPGRADE: upgrade NPM dependencies
+- UPGRADE: Fedora container upgrade: version 43 to 44
+- UPGRADE: Ubuntu container upgrade: version 24.04 to 26.04
 
 1.3.5 (2026-04-11)
 ------------------

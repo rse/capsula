@@ -5,7 +5,7 @@
 ##
 
 #   derive image from a certain base image
-FROM        ubuntu:24.04
+FROM        ubuntu:26.04
 
 #   switch working directory
 WORKDIR     /
@@ -14,8 +14,7 @@ WORKDIR     /
 RUN         apt-get update
 
 #   update system to latest patch-level
-RUN         apt-get upgrade -y && \
-            echo "y" | unminimize
+RUN         apt-get upgrade -y
 
 #   install additional tools
 RUN         apt-get install -y --no-install-recommends \
@@ -25,7 +24,7 @@ RUN         apt-get install -y --no-install-recommends \
 RUN         apt-get install -y --no-install-recommends \
                 sudo bash less tmux vim curl git \
                 procps net-tools htop lsof strace \
-                man manpages
+                man manpages util-linux util-linux-extra
 
 #   reconfigure system for EN/DE and ISO-Latin1/UTF8
 RUN         apt-get install -y --no-install-recommends locales && \

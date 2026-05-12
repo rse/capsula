@@ -5,7 +5,7 @@
 ##
 
 #   derive image from a certain base image
-FROM        fedora:43
+FROM        fedora:44
 
 #   switch working directory
 WORKDIR     /
